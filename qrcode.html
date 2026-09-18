@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Maker — V4ZRASHD</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script defer src="/_vercel/insights/script.js"></script>
+    <style>
+        :root { --bg:#0a0a0f; --card:#1a1a24; --accent:#6c5ce7; --accent2:#00cec9; --text:#e9e9f0; --muted:#8b8ba3; --border:#2a2a38; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui,sans-serif; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:1.5rem; }
+        .container { max-width:480px; width:100%; }
+        .card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:2rem; text-align:center; }
+        h1 { font-size:1.5rem; margin-bottom:0.25rem; }
+        h1 span { background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .sub { color:var(--muted); font-size:0.85rem; margin-bottom:1.5rem; }
+        textarea { width:100%; background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:0.85rem 1rem; color:var(--text); font-size:0.95rem; outline:none; resize:vertical; min-height:90px; font-family:inherit; transition:border-color 0.3s; }
+        textarea:focus { border-color:var(--accent); }
+        .opts { display:flex; gap:0.75rem; margin:1rem 0; }
+        .opt { flex:1; }
+        .opt label { display:block; color:var(--muted); font-size:0.75rem; margin-bottom:0.35rem; text-align:left; }
+        select { width:100%; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:0.5rem; color:var(--text); font-size:0.85rem; outline:none; }
+        .qr-box { background:white; padding:1rem; border-radius:12px; display:inline-block; margin:1rem 0; min-height:180px; display:flex; align-items:center; justify-content:center; }
+        .qr-box img, .qr-box canvas { max-width:100%; }
+        .qr-empty { color:#999; font-size:0.85rem; }
+        .btn { width:100%; padding:0.85rem; border:none; border-radius:10px; font-weight:600; font-size:0.95rem; cursor:pointer; background:linear-gradient(135deg,var(--accent),var(--accent2)); color:white; transition:all 0.3s; }
+        .btn:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(108,92,231,0.4); }
+        .btn-dl { background:transparent; border:1px solid var(--border); color:var(--text); margin-top:0.75rem; }
+        .btn-dl:hover { border-color:var(--accent2); color:var(--accent2); }
+        .btn-dl:disabled { opacity:0.4; cursor:default; transform:none; }
+        .back { text-align:center; margin-top:1.5rem; }
+        .back a { color:var(--accent2); text-decoration:none; font-size:0.85rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>📊 <span>QR Code Maker</span></h1>
+            <p class="sub">যেকোনো টেক্স্ট, লিংক বা তথ্য থেকে QR কোড বানান</p>
+            <textarea id="text" placeholder="এখানে টেক্সট বা URL লিখুন..."></textarea>
+            <div class="opts">
+                <div class="opt">
+                    <label>সাইজ</label>
+                    <select id="size">
+                        <option value="128">Small (128px)</option>
+                        <option value="200" selected>Medium (200px)</option>
+                        <option value="300">Large (300px)</option>
+                        <option value="400">X-Large (400px)</option>
+                    </select>
+                </div>
+                <div class="opt">
+                    <label>রঙ</label>
+                    <select id="color">
+                        <option value="#000000" selected>কালো</option>
+                        <option value="#6c5ce7">বেগুনি</option>
+                        <option value="#0088cc">নীল</option>
+                        <option value="#27ae60">সবুজ</option>
+                        <option value="#e74c3c">লাল</option>
+                    </select>
+                </div>
+            </div>
+            <div class="qr-box" id="qrBox"><span class="qr-empty">QR কোড এখানে দেখাবে</span></div>
+            <br>
+            <button class="btn" onclick="makeQR()">⚡ Generate QR</button>
+            <button class="btn btn-dl" id="dlBtn" disabled onclick="downloadQR()">⬇️ Download PNG</button>
+        </div>
+        <div class="back"><a href="/">← হোমে ফিরুন</a></div>
+    </div>
+
+    <script>
+        let qr = null;
+        function makeQR() {
+            const text = document.getElementById('text').value.trim();
+            if (!text) return;
+            const size = +document.getElementById('size').value;
+            const color = document.getElementById('color').value;
+            const box = document.getElementById('qrBox');
+            box.innerHTML = '';
+            qr = new QRCode(box, {
+                text: text, width: size, height: size,
+                colorDark: color, colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.H
+            });
+            document.getElementById('dlBtn').disabled = false;
+        }
+        function downloadQR() {
+            const img = document.querySelector('#qrBox img') || document.querySelector('#qrBox canvas');
+            if (!img) return;
+            const link = document.createElement('a');
+            link.download = 'v4zrashd-qrcode.png';
+            link.href = img.src || img.toDataURL('image/png');
+            link.click();
+        }
+        // Auto-fill from URL param (from shortener)
+        const params = new URLSearchParams(location.search);
+        if (params.get('text')) {
+            document.getElementById('text').value = params.get('text');
+            makeQR();
+        }
+        document.getElementById('text').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) makeQR();
+        });
+    </script>
+</body>
+</html>

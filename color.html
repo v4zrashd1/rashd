@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Picker — V4ZRASHD</title>
+    <script defer src="/_vercel/insights/script.js"></script>
+    <style>
+        :root { --bg:#0a0a0f; --card:#1a1a24; --accent:#6c5ce7; --accent2:#00cec9; --text:#e9e9f0; --muted:#8b8ba3; --border:#2a2a38; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui,sans-serif; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:1.5rem; }
+        .container { max-width:480px; width:100%; }
+        .card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:2rem; }
+        h1 { font-size:1.5rem; margin-bottom:0.25rem; }
+        h1 span { background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .sub { color:var(--muted); font-size:0.85rem; margin-bottom:1.5rem; }
+        .picker-wrap { display:flex; gap:1rem; align-items:center; margin-bottom:1.5rem; }
+        input[type=color] { width:80px; height:80px; border:1px solid var(--border); border-radius:12px; background:var(--bg); cursor:pointer; padding:0.3rem; }
+        .preview { flex:1; border-radius:12px; min-height:80px; border:1px solid var(--border); transition:background 0.3s; }
+        .vals { display:grid; gap:0.6rem; }
+        .val-row { display:flex; align-items:center; gap:0.75rem; background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:0.65rem 0.85rem; }
+        .val-row label { color:var(--muted); font-size:0.75rem; width:45px; font-weight:700; }
+        .val-row input { flex:1; background:transparent; border:none; color:var(--text); font-family:monospace; font-size:0.95rem; outline:none; user-select:all; }
+        .val-row button { background:transparent; border:1px solid var(--border); border-radius:6px; color:var(--muted); padding:0.3rem 0.6rem; font-size:0.7rem; cursor:pointer; }
+        .val-row button:hover { border-color:var(--accent2); color:var(--accent2); }
+        .sliders { margin-top:1.5rem; display:grid; gap:0.85rem; }
+        .slider-row label { display:flex; justify-content:space-between; color:var(--muted); font-size:0.75rem; margin-bottom:0.35rem; }
+        input[type=range] { width:100%; accent-color:var(--accent); }
+        .palette { display:grid; grid-template-columns:repeat(8,1fr); gap:0.4rem; margin-top:1.5rem; }
+        .swatch { aspect-ratio:1; border-radius:8px; cursor:pointer; border:1px solid var(--border); transition:transform 0.2s; }
+        .swatch:hover { transform:scale(1.15); }
+        .back { text-align:center; margin-top:1.5rem; }
+        .back a { color:var(--accent2); text-decoration:none; font-size:0.85rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>🎨 <span>Color Picker</span></h1>
+            <p class="sub">HEX, RGB, HSL কনভার্ট করুন আর রঙ বেছে নিন</p>
+            <div class="picker-wrap">
+                <input type="color" id="colorInput" value="#6c5ce7">
+                <div class="preview" id="preview"></div>
+            </div>
+            <div class="vals">
+                <div class="val-row"><label>HEX</label><input id="hex" readonly><button onclick="copy('hex')">Copy</button></div>
+                <div class="val-row"><label>RGB</label><input id="rgb" readonly><button onclick="copy('rgb')">Copy</button></div>
+                <div class="val-row"><label>HSL</label><input id="hsl" readonly><button onclick="copy('hsl')">Copy</button></div>
+            </div>
+            <div class="sliders">
+                <div class="slider-row"><label>Hue <span id="hueVal">0°</span></label><input type="range" id="hue" min="0" max="360" value="261"></div>
+                <div class="slider-row"><label>Saturation <span id="satVal">0%</span></label><input type="range" id="sat" min="0" max="100" value="76"></div>
+                <div class="slider-row"><label>Lightness <span id="lightVal">0%</span></label><input type="range" id="light" min="0" max="100" value="64"></div>
+            </div>
+            <div class="palette" id="palette"></div>
+        </div>
+        <div class="back"><a href="/">← হোমে ফিরুন</a></div>
+    </div>
+
+    <script>
+        function hexToRgb(h) {
+            const r = parseInt(h.slice(1,3),16), g = parseInt(h.slice(3,5),16), b = parseInt(h.slice(5,7),16);
+            return {r:r, g:g, b:b};
+        }
+        function rgbToHsl(r,g,b) {
+            r/=255; g/=255; b/=255;
+            const max=Math.max(r,g,b), min=Math.min(r,g,b);
+            let h=0,s=0,l=(max+min)/2;
+            if (max!==min) {
+                const d=max-min;
+                s = l>0.5 ? d/(2-max-min) : d/(max+min);
+                switch(max) {
+                    case r: h=(g-b)/d+(g<b?6:0); break;
+                    case g: h=(b-r)/d+2; break;
+                    case b: h=(r-g)/d+4; break;
+                }
+                h/=6;
+            }
+            return {h:Math.round(h*360), s:Math.round(s*100), l:Math.round(l*100)};
+        }
+        function hslToHex(h,s,l) {
+            h/=360; s/=100; l/=100;
+            let r,g,b;
+            if (s===0) { r=g=b=l; }
+            else {
+                const hue2rgb=function(p,q,t) {
+                    if(t<0) t+=1; if(t>1) t-=1;
+                    if(t<1/6) return p+(q-p)*6*t;
+                    if(t<1/2) return q;
+                    if(t<2/3) return p+(q-p)*(2/3-t)*6;
+                    return p;
+                };
+                const q = l<0.5 ? l*(1+s) : l+s-l*s;
+                const p = 2*l-q;
+                r=hue2rgb(p,q,h+1/3); g=hue2rgb(p,q,h); b=hue2rgb(p,q,h-1/3);
+            }
+            const toHex=function(x){ const hex=Math.round(x*255).toString(16); return hex.length===1?'0'+hex:hex; };
+            return '#'+toHex(r)+toHex(g)+toHex(b);
+        }
+        function update(source) {
+            let hex;
+            if (source==='color' || source==='hex') {
+                hex = document.getElementById('colorInput').value;
+            } else {
+                const h=+document.getElementById('hue').value, s=+document.getElementById('sat').value, l=+document.getElementById('light').value;
+                hex = hslToHex(h,s,l);
+            }
+            const rgb = hexToRgb(hex);
+            const hsl = rgbToHsl(rgb.r,rgb.g,rgb.b);
+            document.getElementById('hex').value = hex.toUpperCase();
+            document.getElementById('rgb').value = 'rgb('+rgb.r+', '+rgb.g+', '+rgb.b+')';
+            document.getElementById('hsl').value = 'hsl('+hsl.h+', '+hsl.s+'%, '+hsl.l+'%)';
+            document.getElementById('preview').style.background = hex;
+            document.getElementById('colorInput').value = hex;
+            document.getElementById('hue').value = hsl.h;
+            document.getElementById('sat').value = hsl.s;
+            document.getElementById('light').value = hsl.l;
+            document.getElementById('hueVal').textContent = hsl.h+'°';
+            document.getElementById('satVal').textContent = hsl.s+'%';
+            document.getElementById('lightVal').textContent = hsl.l+'%';
+        }
+        function copy(id) {
+            const txt = document.getElementById(id).value;
+            navigator.clipboard.writeText(txt);
+        }
+        document.getElementById('colorInput').addEventListener('input', function(){ update('color'); });
+        ['hue','sat','light'].forEach(function(id){
+            document.getElementById(id).addEventListener('input', function(){ update('hsl'); });
+        });
+        // Palette
+        const colors = ['#e74c3c','#e67e22','#f1c40f','#27ae60','#00cec9','#3498db','#6c5ce7','#fd79a8','#c0392b','#d35400','#f39c12','#16a085','#0984e3','#5f27cd','#e84393','#2d3436'];
+        const pal = document.getElementById('palette');
+        colors.forEach(function(c){
+            const sw = document.createElement('div');
+            sw.className = 'swatch'; sw.style.background = c;
+            sw.title = c;
+            sw.onclick = function() {
+                document.getElementById('colorInput').value = c;
+                update('color');
+            };
+            pal.appendChild(sw);
+        });
+        update('color');
+    </script>
+</body>
+</html>
