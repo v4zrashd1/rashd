@@ -212,7 +212,10 @@
         footer p { color: var(--muted); font-size: 0.85rem; }
         footer .heart { color: var(--accent3); }
 
-        /* Reveal animation */
+        .voice-btn { margin-top:1.5rem; background:transparent; border:1px solid var(--accent2); color:var(--accent2); padding:0.6rem 1.4rem; border-radius:50px; font-size:0.85rem; cursor:pointer; transition:all 0.3s; }
+        .voice-btn:hover { background:rgba(0,206,201,0.1); transform:translateY(-2px); }
+        .voice-btn.speaking { animation:pulse 1s infinite; }
+        @keyframes pulse { 0%,100% { box-shadow:0 0 0 0 rgba(0,206,201,0.4); } 50% { box-shadow:0 0 0 12px rgba(0,206,201,0); } }
         .reveal { opacity: 0; transform: translateY(30px); transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1); }
         .reveal.active { opacity: 1; transform: translateY(0); }
 
@@ -254,6 +257,7 @@
                 <a href="#apps" class="btn btn-primary">📦 অ্যাপস দেখুন</a>
                 <button class="btn btn-outline" onclick="openModal()">📢 চ্যানেল জয়েন করুন</button>
             </div>
+            <button class="voice-btn" id="voiceBtn" onclick="speakWelcome()">🔊 আমাকে শুনুন</button>
             <div class="stats">
                 <div class="stat-item"><div class="stat-num" id="stat1">0</div><div class="stat-label">অ্যাপস</div></div>
                 <div class="stat-item"><div class="stat-num" id="stat2">0</div><div class="stat-label">ইউজার</div></div>
@@ -416,6 +420,20 @@
 
         // Mobile menu
         function toggleMenu() { document.getElementById('navLinks').classList.toggle('open'); }
+
+        // Voice welcome
+        let speaking = false;
+        function speakWelcome() {
+            const btn = document.getElementById('voiceBtn');
+            if (!('speechSynthesis' in window)) { alert('আপনার ব্রাউজারে ভয়েস সাপোর্ট নেই'); return; }
+            if (speaking) { speechSynthesis.cancel(); speaking=false; btn.classList.remove('speaking'); btn.textContent='🔊 আমাকে শুনুন'; return; }
+            const txt = 'স্বাগতম V4ZRASHD এ! এটি রাশেদের ডিজিটাল হাব। এখানে আপনি পাবেন: ৬টি কাজের টুল — পাসওয়ার্ড জেনারেটর, ইউ আর এল শর্টনার, কিউ আর কোড মেকার, কালার পিকার, টাইমার আর নোট এডিটর। সব ফ্রি, সব ব্রাউজারেই চলবে, কোনো ইন্সটল লাগবে না। আমার টেলিগ্রাম চ্যানেল জয়েন করলে পাবেন নতুন আপডেট আর এক্সক্লুসিভ অ্যাপস। ধন্যবাদ আমাদের সাথে থাকার জন্য!';
+            const u = new SpeechSynthesisUtterance(txt);
+            u.lang = 'bn-BD'; u.rate = 0.95; u.pitch = 1;
+            u.onend = function(){ speaking=false; btn.classList.remove('speaking'); btn.textContent='🔊 আমাকে শুনুন'; };
+            speaking = true; btn.classList.add('speaking'); btn.textContent='⏸️ থামান';
+            speechSynthesis.speak(u);
+        }
 
         // Reveal on scroll
         const observer = new IntersectionObserver(function(entries) {
