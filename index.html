@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>V4ZRASHD — Digital Hub</title>
+    <meta name="description" content="V4ZRASHD — Apps, Tools & Digital Innovation by Rasheed">
+    <script defer src="/_vercel/insights/script.js"></script>
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --bg2: #12121a;
+            --card: #1a1a24;
+            --accent: #6c5ce7;
+            --accent2: #00cec9;
+            --accent3: #fd79a8;
+            --text: #e9e9f0;
+            --muted: #8b8ba3;
+            --border: #2a2a38;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
+
+        /* Animated background */
+        .bg-animation {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; overflow: hidden;
+        }
+        .blob {
+            position: absolute; border-radius: 50%; filter: blur(80px);
+            opacity: 0.35; animation: float 20s infinite ease-in-out;
+        }
+        .blob:nth-child(1) { width: 500px; height: 500px; background: var(--accent); top: -100px; left: -100px; }
+        .blob:nth-child(2) { width: 400px; height: 400px; background: var(--accent2); bottom: -100px; right: -100px; animation-delay: -5s; }
+        .blob:nth-child(3) { width: 350px; height: 350px; background: var(--accent3); top: 40%; left: 50%; animation-delay: -10s; }
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(60px, -60px) scale(1.1); }
+            66% { transform: translate(-40px, 40px) scale(0.95); }
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            padding: 1rem 2rem; display: flex; justify-content: space-between;
+            align-items: center; backdrop-filter: blur(12px);
+            background: rgba(10, 10, 15, 0.75); border-bottom: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+        .logo {
+            font-size: 1.5rem; font-weight: 800; letter-spacing: 1px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+        .nav-links a {
+            color: var(--muted); text-decoration: none; font-size: 0.95rem;
+            transition: color 0.3s; position: relative;
+        }
+        .nav-links a:hover { color: var(--text); }
+        .nav-links a::after {
+            content: ''; position: absolute; bottom: -4px; left: 0; width: 0;
+            height: 2px; background: var(--accent); transition: width 0.3s;
+        }
+        .nav-links a:hover::after { width: 100%; }
+        .menu-btn { display: none; background: none; border: none; color: var(--text); font-size: 1.5rem; cursor: pointer; }
+
+        /* Hero */
+        header {
+            min-height: 100vh; display: flex; align-items: center; justify-content: center;
+            text-align: center; padding: 6rem 2rem 4rem; position: relative;
+        }
+        .hero-content { max-width: 800px; animation: fadeInUp 1s ease; }
+        .badge {
+            display: inline-block; padding: 0.4rem 1.2rem; border-radius: 50px;
+            background: rgba(108, 92, 231, 0.15); border: 1px solid var(--accent);
+            color: var(--accent2); font-size: 0.85rem; margin-bottom: 1.5rem;
+            backdrop-filter: blur(5px);
+        }
+        h1 {
+            font-size: clamp(2.5rem, 8vw, 5rem); font-weight: 900; line-height: 1.1;
+            margin-bottom: 1.5rem;
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, var(--accent), var(--accent2), var(--accent3));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; background-size: 200% 200%;
+            animation: gradientShift 5s ease infinite;
+        }
+        @keyframes gradientShift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+        .hero-sub { font-size: clamp(1rem, 3vw, 1.25rem); color: var(--muted); margin-bottom: 2.5rem; }
+        .cta-group { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+        .btn {
+            padding: 0.9rem 2rem; border-radius: 12px; border: none; font-size: 1rem;
+            font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex;
+            align-items: center; gap: 0.5rem; transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent2)); color: white;
+            box-shadow: 0 4px 20px rgba(108, 92, 231, 0.4);
+        }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(108, 92, 231, 0.6); }
+        .btn-outline { background: transparent; color: var(--text); border: 1px solid var(--border); }
+        .btn-outline:hover { border-color: var(--accent); background: rgba(108, 92, 231, 0.1); transform: translateY(-3px); }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Stats */
+        .stats { display: flex; justify-content: center; gap: 3rem; margin-top: 3rem; flex-wrap: wrap; }
+        .stat-item { text-align: center; }
+        .stat-num { font-size: 2rem; font-weight: 800; color: var(--accent2); }
+        .stat-label { color: var(--muted); font-size: 0.85rem; }
+
+        /* Sections */
+        section { padding: 5rem 2rem; max-width: 1200px; margin: 0 auto; }
+        .section-title { text-align: center; margin-bottom: 3rem; }
+        .section-title h2 { font-size: clamp(1.75rem, 5vw, 2.5rem); font-weight: 800; margin-bottom: 0.75rem; }
+        .section-title p { color: var(--muted); }
+        .divider { width: 60px; height: 4px; background: linear-gradient(90deg, var(--accent), var(--accent2)); margin: 1rem auto 0; border-radius: 2px; }
+
+        /* Apps Grid */
+        .apps-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+        .app-card {
+            background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+            padding: 1.75rem; transition: all 0.3s ease; position: relative; overflow: hidden;
+        }
+        .app-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            transform: scaleX(0); transform-origin: left; transition: transform 0.4s ease;
+        }
+        .app-card:hover { transform: translateY(-6px); border-color: var(--accent); box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
+        .app-card:hover::before { transform: scaleX(1); }
+        .app-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+        .app-card h3 { font-size: 1.2rem; margin-bottom: 0.5rem; }
+        .app-card p { color: var(--muted); font-size: 0.9rem; margin-bottom: 1rem; }
+        .app-meta { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .tag { padding: 0.25rem 0.75rem; border-radius: 50px; background: rgba(108, 92, 231, 0.15); color: var(--accent2); font-size: 0.75rem; }
+        .tag.pink { background: rgba(253, 121, 168, 0.15); color: var(--accent3); }
+
+        /* Tools */
+        .tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem; }
+        .tool-card {
+            background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+            padding: 1.75rem; text-align: center; transition: all 0.3s ease; cursor: pointer;
+        }
+        .tool-card:hover { transform: translateY(-6px) scale(1.02); border-color: var(--accent2); box-shadow: 0 12px 40px rgba(0, 206, 201, 0.15); }
+        .tool-icon { font-size: 2.75rem; margin-bottom: 1rem; display: inline-block; transition: transform 0.3s; }
+        .tool-card:hover .tool-icon { transform: rotate(10deg) scale(1.15); }
+        .tool-card h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+        .tool-card p { color: var(--muted); font-size: 0.85rem; }
+
+        /* Telegram CTA */
+        .telegram-section {
+            background: linear-gradient(135deg, rgba(108, 92, 231, 0.12), rgba(0, 206, 201, 0.08));
+            border: 1px solid var(--border); border-radius: 24px; padding: 3.5rem 2rem;
+            text-align: center; max-width: 1200px; margin: 0 auto 5rem; position: relative; overflow: hidden;
+        }
+        .telegram-section h2 { font-size: clamp(1.5rem, 4vw, 2.25rem); margin-bottom: 1rem; }
+        .telegram-section p { color: var(--muted); margin-bottom: 2rem; max-width: 500px; margin-left: auto; margin-right: auto; }
+        .tg-btn {
+            background: linear-gradient(135deg, #229ED9, #0088cc); color: white; font-size: 1.05rem;
+            padding: 1rem 2.5rem; box-shadow: 0 4px 20px rgba(34, 158, 217, 0.4);
+        }
+        .tg-btn:hover { box-shadow: 0 8px 30px rgba(34, 158, 217, 0.65); transform: translateY(-3px); }
+
+        /* Join Modal */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 1000;
+            background: rgba(5, 5, 10, 0.8); backdrop-filter: blur(8px);
+            display: none; align-items: center; justify-content: center; padding: 1.5rem;
+        }
+        .modal-overlay.active { display: flex; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .modal {
+            background: var(--card); border: 1px solid var(--accent); border-radius: 20px;
+            padding: 2.5rem; max-width: 420px; width: 100%; text-align: center;
+            animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(40px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .modal-icon { font-size: 3rem; margin-bottom: 1rem; }
+        .modal h3 { font-size: 1.4rem; margin-bottom: 0.75rem; }
+        .modal p { color: var(--muted); font-size: 0.9rem; margin-bottom: 1.75rem; }
+        .modal-btns { display: flex; gap: 0.75rem; }
+        .modal-btns .btn { flex: 1; justify-content: center; }
+
+        /* Contact */
+        .contact-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.5rem; }
+        .contact-card {
+            background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+            padding: 1.5rem; text-align: center; text-decoration: none; color: var(--text);
+            transition: all 0.3s ease;
+        }
+        .contact-card:hover { transform: translateY(-4px); border-color: var(--accent3); }
+        .contact-card .icon { font-size: 2rem; margin-bottom: 0.75rem; }
+        .contact-card h4 { margin-bottom: 0.25rem; }
+        .contact-card span { color: var(--muted); font-size: 0.8rem; }
+
+        /* Footer */
+        footer { border-top: 1px solid var(--border); padding: 2.5rem 2rem; text-align: center; }
+        footer p { color: var(--muted); font-size: 0.85rem; }
+        footer .heart { color: var(--accent3); }
+
+        /* Reveal animation */
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .nav-links { display: none; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; background: var(--bg2); padding: 1rem 2rem; gap: 1rem; border-bottom: 1px solid var(--border); }
+            .nav-links.open { display: flex; }
+            .menu-btn { display: block; }
+            .stats { gap: 1.75rem; }
+            section { padding: 3.5rem 1.25rem; }
+            .modal-btns { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation">
+        <div class="blob"></div>
+        <div class="blob"></div>
+        <div class="blob"></div>
+    </div>
+
+    <nav>
+        <div class="logo">V4ZRASHD</div>
+        <button class="menu-btn" onclick="toggleMenu()">☰</button>
+        <div class="nav-links" id="navLinks">
+            <a href="#home">হোম</a>
+            <a href="#apps">অ্যাপস</a>
+            <a href="#tools">টুলস</a>
+            <a href="#contact">যোগাযোগ</a>
+        </div>
+    </nav>
+
+    <header id="home">
+        <div class="hero-content">
+            <span class="badge">🚀 Digital Innovation Hub</span>
+            <h1>স্বাগতম <span class="gradient-text">V4ZRASHD</span> এ</h1>
+            <p class="hero-sub">অ্যাপস, টুলস আর ডিজিটাল সমাধানের এক ঠিকানা। রাশেদের তৈরি প্রতিটা প্রজেক্ট — এক জায়গায়, ফ্রি, আর সবসময় আপডেটেড।</p>
+            <div class="cta-group">
+                <a href="#apps" class="btn btn-primary">📦 অ্যাপস দেখুন</a>
+                <button class="btn btn-outline" onclick="openModal()">📢 চ্যানেল জয়েন করুন</button>
+            </div>
+            <div class="stats">
+                <div class="stat-item"><div class="stat-num" id="stat1">0</div><div class="stat-label">অ্যাপস</div></div>
+                <div class="stat-item"><div class="stat-num" id="stat2">0</div><div class="stat-label">ইউজার</div></div>
+                <div class="stat-item"><div class="stat-num" id="stat3">0</div><div class="stat-label">ডাউনলোড</div></div>
+                <div class="stat-item"><div class="stat-num" id="stat4">0</div><div class="stat-label">স্টার</div></div>
+            </div>
+        </div>
+    </header>
+
+    <section id="apps">
+        <div class="section-title reveal">
+            <h2>📱 আমার অ্যাপস</h2>
+            <p>সব ফ্রি, সব ওপেন সোর্স</p>
+            <div class="divider"></div>
+        </div>
+        <div class="apps-grid">
+            <div class="app-card reveal">
+                <div class="app-icon">🤖</div>
+                <h3>V4ZRASHD Chat Bot</h3>
+                <p>টেলিগ্রাম চ্যাট বট — AI চ্যাট, গ্রুপ ম্যানেজমেন্ট, আর আরো অনেক কিছু।</p>
+                <div class="app-meta"><span class="tag">Telegram</span><span class="tag pink">Bot</span></div>
+            </div>
+            <div class="app-card reveal">
+                <div class="app-icon">🎬</div>
+                <h3>Video Download Bot</h3>
+                <p>যেকোনো ভিডিও ডাউনলোড করুন সরাসরি টেলিগ্রামে — দ্রুত আর সহজ।</p>
+                <div class="app-meta"><span class="tag">Media</span><span class="tag pink">Downloader</span></div>
+            </div>
+            <div class="app-card reveal">
+                <div class="app-icon">🏪</div>
+                <h3>Rashd App Store</h3>
+                <p>ওয়েব বেসড অ্যাপ স্টোর — সরাসরি APK ডাউনলোড আর আপডেট এক জায়গায়।</p>
+                <div class="app-meta"><span class="tag">Web</span><span class="tag pink">Store</span></div>
+            </div>
+            <div class="app-card reveal">
+                <div class="app-icon">📸</div>
+                <h3>Camera Tools</h3>
+                <p>ক্যামেরা অ্যাক্সেস, স্ক্রিন শেয়ার, আর লোকেশন টুলস — সব ব্রাউজারে।</p>
+                <div class="app-meta"><span class="tag">PWA</span><span class="tag pink">Tools</span></div>
+            </div>
+            <div class="app-card reveal">
+                <div class="app-icon">🔍</div>
+                <h3>QR Code Scanner</h3>
+                <p>QR কোড স্ক্যান করুন তাৎক্ষণিক — zbar ইঞ্জিন দিয়ে দ্রুত আর নির্ভুল।</p>
+                <div class="app-meta"><span class="tag">Utility</span><span class="tag pink">Scanner</span></div>
+            </div>
+            <div class="app-card reveal">
+                <div class="app-icon">⚡</div>
+                <h3>Edge Middleware</h3>
+                <p>Vercel Edge নেটওয়ার্কে সিকিউরিটি হেডার আর রাউটিং — সব অটোমেটেড।</p>
+                <div class="app-meta"><span class="tag">Vercel</span><span class="tag pink">Edge</span></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="tools">
+        <div class="section-title reveal">
+            <h2>🛠️ ফ্রি টুলস</h2>
+            <p>ব্রাউজারেই চলবে, কোনো ইন্সটল লাগবে না</p>
+            <div class="divider"></div>
+        </div>
+        <div class="tools-grid">
+            <div class="tool-card reveal" onclick="alert('শীঘ্রই আসছে! 🔧')">
+                <span class="tool-icon">🔐</span>
+                <h3>পাসওয়ার্ড জেনারেটর</h3>
+                <p>শক্তিশালী র‍্যান্ডম পাসওয়ার্ড বানান</p>
+            </div>
+            <div class="tool-card reveal" onclick="alert('শীঘ্রই আসছে! 🔧')">
+                <span class="tool-icon">🌐</span>
+                <h3>URL শর্টনার</h3>
+                <p>লম্বা লিংক ছোট করুন এক ক্লিকে</p>
+            </div>
+            <div class="tool-card reveal" onclick="alert('শীঘ্রই আসছে! 🔧')">
+                <span class="tool-icon">📊</span>
+                <h3>QR কোড মেকার</h3>
+                <p>যেকোনো টেক্স্ট বা লিংক থেকে QR</p>
+            </div>
+            <div class="tool-card reveal" onclick="alert('শীঘ্রই আসছে! 🔧')">
+                <span class="tool-icon">🎨</span>
+                <h3>কালার পিকার</h3>
+                <p>HEX, RGB, HSL কনভার্ট করুন</p>
+            </div>
+            <div class="tool-card reveal" onclick="alert('শীঘ্রই আসছে! 🔧')">
+                <span class="tool-icon">⏱️</span>
+                <h3>টাইমার</h3>
+                <p>কাউন্টডাউন আর স্টপওয়াচ</p>
+            </div>
+            <div class="tool-card reveal" onclick="alert('শীঘ্রই আসছে! 🔧')">
+                <span class="tool-icon">📝</span>
+                <h3>টেক্সট এডিটর</h3>
+                <p>নোট লিখুন, অফলাইনে সেভ হবে</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="telegram-section reveal">
+        <h2>📢 আমার টেলিগ্রাম চ্যানেল</h2>
+        <p>নতুন আপডেট, এক্সক্লুসিভ অ্যাপস, আর সাপোর্ট — সব এক চ্যানেলে। জয়েন করুন এখনই!</p>
+        <button class="btn tg-btn" onclick="openModal()">✈️ Join Telegram Channel</button>
+    </div>
+
+    <section id="contact">
+        <div class="section-title reveal">
+            <h2>📞 যোগাযোগ</h2>
+            <p>সরাসরি কথা বলতে চান? এখানে আছি</p>
+            <div class="divider"></div>
+        </div>
+        <div class="contact-grid">
+            <a href="https://t.me/v4zrasehd" target="_blank" class="contact-card reveal">
+                <div class="icon">✈️</div>
+                <h4>Telegram</h4>
+                <span>@v4zrasehd</span>
+            </a>
+            <a href="https://github.com/v4zrashd1" target="_blank" class="contact-card reveal">
+                <div class="icon">🐙</div>
+                <h4>GitHub</h4>
+                <span>github.com/v4zrashd1</span>
+            </a>
+            <a href="https://t.me/v4zrasehd" target="_blank" class="contact-card reveal">
+                <div class="icon">📢</div>
+                <h4>Channel</h4>
+                <span>t.me/v4zrasehd</span>
+            </a>
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2026 <strong>V4ZRASHD</strong> — Made with <span class="heart">❤</span> by Rasheed</p>
+    </footer>
+
+    <!-- Join Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-icon">✈️</div>
+            <h3>Join my Telegram Channel</h3>
+            <p>নতুন আপডেট আর এক্সক্লুসিভ কনটেন্ট পেতে আমার চ্যানেল জয়েন করুন!</p>
+            <div class="modal-btns">
+                <button class="btn btn-primary" onclick="joinChannel()">✅ Join</button>
+                <button class="btn btn-outline" onclick="closeModal()">❌ Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Modal
+        function openModal() { document.getElementById('modalOverlay').classList.add('active'); }
+        function closeModal() { document.getElementById('modalOverlay').classList.remove('active'); }
+        function joinChannel() {
+            window.open('https://t.me/v4zrasehd', '_blank');
+            closeModal();
+        }
+        // Close on overlay click
+        document.getElementById('modalOverlay').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+        // Close on Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // Mobile menu
+        function toggleMenu() { document.getElementById('navLinks').classList.toggle('open'); }
+
+        // Reveal on scroll
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+        document.querySelectorAll('.reveal').forEach(function(el) { observer.observe(el); });
+
+        // Animated counters
+        function animateCounter(id, target, duration) {
+            const el = document.getElementById(id);
+            const start = 0;
+            const startTime = performance.now();
+            function update(now) {
+                const progress = Math.min((now - startTime) / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                el.textContent = Math.floor(start + (target - start) * eased);
+                if (progress < 1) requestAnimationFrame(update);
+                else el.textContent = target + (target >= 1000 ? '+' : '');
+            }
+            requestAnimationFrame(update);
+        }
+        setTimeout(function() {
+            animateCounter('stat1', 12, 2000);
+            animateCounter('stat2', 5000, 2500);
+            animateCounter('stat3', 25000, 3000);
+            animateCounter('stat4', 150, 2000);
+        }, 500);
+    </script>
+</body>
+</html>
