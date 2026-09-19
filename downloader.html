@@ -150,9 +150,12 @@
             dlBtn.innerHTML = '<span class="spinner"></span>চেক করা হচ্ছে...';
 
             try {
-                // Step 1: HEAD request via proxy to get file info
+                // Step 1: HEAD request via proxy to get file info (Range: 0-0 keeps it tiny but reveals full size)
                 const headUrl = PROXY + encodeURIComponent(url);
-                const r = await fetch(headUrl, { method: 'GET' });
+                const r = await fetch(headUrl, {
+                    method: 'GET',
+                    headers: { 'Range': 'bytes=0-0' },
+                });
 
                 if (!r.ok && r.status !== 206) {
                     let msg = 'ডাউনলোড ব্যর্থ (HTTP ' + r.status + ')';
@@ -169,9 +172,15 @@
                 const nameMatch = cd.match(/filename="?([^"]+)"?/);
                 const name = nameMatch ? nameMatch[1] : url.split('/').pop().split('?')[0] || 'download';
 
-                // Show info
+                // Show info (range request means size = part of full file, re-fetch total via Content-Range)
+                let totalSize = size;
+                const cr = r.headers.get('Content-Range');
+                if (cr) {
+                    const m = cr.match(/\/(\d+)/);
+                    if (m) totalSize = parseInt(m[1], 10);
+                }
                 document.getElementById('infoType').textContent = type;
-                document.getElementById('infoSize').textContent = fmtSize(size) || 'অজানা';
+                document.getElementById('infoSize').textContent = fmtSize(totalSize);
                 document.getElementById('infoName').textContent = name;
                 document.getElementById('infoStatus').textContent = '✅ প্রস্তুত';
                 info.classList.add('show');
