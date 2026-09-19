@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ইমেজ টুলকিট — V4ZRASHD</title>
+    <script defer src="/_vercel/insights/script.js"></script>
+    <style>
+        :root { --bg:#0a0a0f; --card:#1a1a24; --accent:#6c5ce7; --accent2:#00cec9; --accent3:#fd79a8; --text:#e9e9f0; --muted:#8b8ba3; --border:#2a2a38; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui,sans-serif; min-height:100vh; padding:4rem 1.5rem 2rem; }
+        .container { max-width:680px; margin:0 auto; }
+        .card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:2rem; margin-bottom:1.5rem; }
+        h1 { font-size:1.4rem; text-align:center; margin-bottom:0.25rem; }
+        h1 span { background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .sub { color:var(--muted); font-size:0.85rem; text-align:center; margin-bottom:1.5rem; }
+        .tabs { display:flex; gap:0.5rem; margin-bottom:1.5rem; background:var(--bg); padding:0.4rem; border-radius:12px; }
+        .tab { flex:1; padding:0.6rem; border:none; border-radius:8px; background:transparent; color:var(--muted); font-size:0.85rem; font-weight:600; cursor:pointer; transition:all 0.3s; }
+        .tab.active { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:white; }
+        .drop { border:2px dashed var(--border); border-radius:12px; padding:2rem; text-align:center; color:var(--muted); cursor:pointer; transition:all 0.3s; margin-bottom:1rem; }
+        .drop:hover, .drop.over { border-color:var(--accent2); background:rgba(0,206,201,0.05); }
+        .drop input { display:none; }
+        .preview { text-align:center; margin-bottom:1rem; }
+        .preview img { max-width:100%; max-height:260px; border-radius:10px; border:1px solid var(--border); }
+        .controls { display:flex; flex-direction:column; gap:0.75rem; margin-bottom:1rem; }
+        .control-row { display:flex; align-items:center; gap:0.75rem; }
+        .control-row label { font-size:0.82rem; color:var(--muted); min-width:110px; }
+        input[type=range] { flex:1; accent-color:var(--accent); }
+        select, input[type=number] { background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:0.5rem 0.75rem; color:var(--text); font-size:0.85rem; outline:none; flex:1; }
+        .val { font-size:0.8rem; color:var(--accent2); min-width:55px; text-align:right; }
+        .btn { width:100%; padding:0.85rem; border:none; border-radius:10px; font-weight:600; font-size:0.95rem; cursor:pointer; background:linear-gradient(135deg,var(--accent),var(--accent2)); color:white; transition:all 0.3s; }
+        .btn:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(108,92,231,0.4); }
+        .btn:disabled { opacity:0.4; cursor:wait; transform:none; }
+        .result { display:none; margin-top:1rem; }
+        .result.show { display:block; }
+        .result img { max-width:100%; max-height:260px; border-radius:10px; border:1px solid var(--border); margin-bottom:0.75rem; }
+        .info { font-size:0.78rem; color:var(--muted); text-align:center; margin-bottom:0.75rem; }
+        .err { color:#e74c3c; font-size:0.85rem; text-align:center; display:none; margin-top:0.75rem; }
+        .back { text-align:center; }
+        .back a { color:var(--accent2); text-decoration:none; font-size:0.85rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🖼️ <span>ইমেজ টুলকিট</span></h1>
+        <p class="sub">ছবি কমপ্রেস, কনভার্ট, রিসাইজ — সব ব্রাউজারে, ফ্রি</p>
+
+        <div class="card">
+            <div class="tabs">
+                <button class="tab active" onclick="setTab('compress')">🗜️ কমপ্রেস</button>
+                <button class="tab" onclick="setTab('convert')">🔄 কনভার্ট</button>
+                <button class="tab" onclick="setTab('resize')">📐 রিসাইজ</button>
+            </div>
+
+            <div class="drop" id="drop" onclick="document.getElementById('fileInput').click()">
+                <div style="font-size:2.2rem;margin-bottom:0.5rem">📷</div>
+                <div>ছবি নির্বাচন করুন অথবা টেনে এনে ছাড়ুন</div>
+                <div style="font-size:0.72rem;margin-top:0.4rem">PNG, JPG, WEBP, GIF — সর্বোচ্চ 20MB</div>
+                <input type="file" id="fileInput" accept="image/*">
+            </div>
+
+            <div class="preview" id="preview" style="display:none">
+                <img id="previewImg" alt="preview">
+                <div class="info" id="previewInfo"></div>
+            </div>
+
+            <div class="controls" id="controls">
+                <!-- Compress -->
+                <div id="ctrl-compress">
+                    <div class="control-row">
+                        <label>কোয়ালিটি</label>
+                        <input type="range" id="quality" min="10" max="100" value="60" oninput="document.getElementById('qualityVal').textContent=this.value+'%'">
+                        <span class="val" id="qualityVal">60%</span>
+                    </div>
+                </div>
+                <!-- Convert -->
+                <div id="ctrl-convert" style="display:none">
+                    <div class="control-row">
+                        <label>ফরম্যাট</label>
+                        <select id="convertFormat">
+                            <option value="image/jpeg">JPG</option>
+                            <option value="image/png">PNG</option>
+                            <option value="image/webp">WEBP</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- Resize -->
+                <div id="ctrl-resize" style="display:none">
+                    <div class="control-row">
+                        <label>চওড়া (px)</label>
+                        <input type="number" id="resizeW" placeholder="800" min="1">
+                    </div>
+                    <div class="control-row">
+                        <label>উচ্চতা (px)</label>
+                        <input type="number" id="resizeH" placeholder="অটো" min="1">
+                    </div>
+                    <div class="control-row">
+                        <label>অ্যাসপেক্ট রেশিও</label>
+                        <input type="checkbox" id="keepRatio" checked style="accent-color:var(--accent)">
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn" id="processBtn" onclick="process()" disabled>⏳ ছবি লোড করুন</button>
+
+            <div class="err" id="err"></div>
+
+            <div class="result" id="result">
+                <div class="info" id="resultInfo"></div>
+                <img id="resultImg" alt="result">
+                <button class="btn" onclick="downloadResult()">⬇️ ডাউনলোড করুন</button>
+            </div>
+        </div>
+
+        <div class="back"><a href="/">← হোমে ফিরুন</a></div>
+    </div>
+
+    <script>
+        let tab = 'compress';
+        let origImg = null;
+        let origFile = null;
+        let resultBlob = null;
+        const drop = document.getElementById('drop');
+        const fileInput = document.getElementById('fileInput');
+
+        function setTab(t) {
+            tab = t;
+            document.querySelectorAll('.tab').forEach(function(b, i) {
+                b.classList.toggle('active', ['compress','convert','resize'][i] === t);
+            });
+            document.getElementById('ctrl-compress').style.display = t === 'compress' ? 'flex' : 'none';
+            document.getElementById('ctrl-convert').style.display = t === 'convert' ? 'flex' : 'none';
+            document.getElementById('ctrl-resize').style.display = t === 'resize' ? 'flex' : 'none';
+            const btn = document.getElementById('processBtn');
+            btn.textContent = origImg ? ({compress:'🗜️ কমপ্রেস করুন', convert:'🔄 কনভার্ট করুন', resize:'📐 রিসাইজ করুন'}[t]) : '⏳ ছবি লোড করুন';
+        }
+
+        drop.addEventListener('dragover', function(e) { e.preventDefault(); drop.classList.add('over'); });
+        drop.addEventListener('dragleave', function() { drop.classList.remove('over'); });
+        drop.addEventListener('drop', function(e) {
+            e.preventDefault();
+            drop.classList.remove('over');
+            if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);
+        });
+        fileInput.addEventListener('change', function() {
+            if (this.files[0]) loadFile(this.files[0]);
+        });
+
+        function loadFile(file) {
+            if (!file.type.startsWith('image/')) { showError('এটি ছবি নয়। PNG, JPG, WEBP বা GIF দিন।'); return; }
+            if (file.size > 20 * 1048576) { showError('ফাইল 20MB এর বেশি। ছোট ফাইল দিন।'); return; }
+            origFile = file;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    origImg = img;
+                    document.getElementById('previewImg').src = e.target.result;
+                    document.getElementById('preview').style.display = 'block';
+                    document.getElementById('previewInfo').textContent =
+                        file.name + ' • ' + img.width + '×' + img.height + ' • ' + (file.size/1048576).toFixed(2) + ' MB';
+                    document.getElementById('result').classList.remove('show');
+                    setTab(tab);
+                    document.getElementById('processBtn').disabled = false;
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function showError(msg) {
+            const e = document.getElementById('err');
+            e.textContent = '❌ ' + msg;
+            e.style.display = 'block';
+            setTimeout(function() { e.style.display = 'none'; }, 4000);
+        }
+
+        function process() {
+            if (!origImg) return;
+            const err = document.getElementById('err');
+            err.style.display = 'none';
+
+            let canvas = document.createElement('canvas');
+            let ctx = canvas.getContext('2d');
+            let mime = 'image/jpeg';
+            let q = 0.92;
+
+            if (tab === 'compress') {
+                q = parseInt(document.getElementById('quality').value, 10) / 100;
+                canvas.width = origImg.width;
+                canvas.height = origImg.height;
+                mime = origFile.type === 'image/png' ? 'image/png' : 'image/jpeg';
+                if (mime === 'image/png') q = undefined; // PNG is lossless
+            } else if (tab === 'convert') {
+                mime = document.getElementById('convertFormat').value;
+                canvas.width = origImg.width;
+                canvas.height = origImg.height;
+            } else if (tab === 'resize') {
+                let w = parseInt(document.getElementById('resizeW').value, 10);
+                let h = parseInt(document.getElementById('resizeH').value, 10);
+                if (!w && !h) { showError('চওড়া বা উচ্চতা দিন।'); return; }
+                if (!w) w = origImg.width;
+                if (!h) h = origImg.height;
+                if (document.getElementById('keepRatio').checked) {
+                    const ratio = origImg.width / origImg.height;
+                    if (w / h > ratio) w = Math.round(h * ratio);
+                    else h = Math.round(w / ratio);
+                }
+                canvas.width = w;
+                canvas.height = h;
+                mime = origFile.type === 'image/png' ? 'image/png' : 'image/jpeg';
+            }
+
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(origImg, 0, 0, canvas.width, canvas.height);
+
+            canvas.toBlob(function(blob) {
+                if (!blob) { showError('প্রসেস করা যায়নি।'); return; }
+                resultBlob = blob;
+                const url = URL.createObjectURL(blob);
+                document.getElementById('resultImg').src = url;
+                document.getElementById('resultInfo').textContent =
+                    canvas.width + '×' + canvas.height + ' • ' + (blob.size/1048576).toFixed(2) + ' MB • ' + (mime.split('/')[1]).toUpperCase();
+                document.getElementById('result').classList.add('show');
+            }, mime, q);
+        }
+
+        function downloadResult() {
+            if (!resultBlob) return;
+            const a = document.createElement('a');
+            const ext = resultBlob.type.split('/')[1];
+            const name = (origFile ? origFile.name.replace(/\.[^.]+$/, '') : 'image') + '_v4zrashd.' + ext;
+            a.href = URL.createObjectURL(resultBlob);
+            a.download = name;
+            a.click();
+            URL.revokeObjectURL(a.href);
+        }
+    </script>
+</body>
+</html>
