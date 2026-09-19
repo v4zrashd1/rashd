@@ -124,6 +124,16 @@
         .done-badge.show { display: block; }
         @keyframes popIn { from{opacity:0;transform:scale(.7);} to{opacity:1;transform:scale(1);} }
 
+        .manual-link {
+            display: none; margin-top: 1rem; padding: 0.9rem; border-radius: 14px;
+            background: linear-gradient(135deg, rgba(108,92,231,.18), rgba(0,206,201,.18));
+            border: 1px solid rgba(108,92,231,.45); text-align: center;
+            color: #fff; font-weight: 700; font-size: .9rem; text-decoration: none;
+            animation: popIn .5s cubic-bezier(.34,1.56,.64,1);
+        }
+        .manual-link.show { display: block; }
+        .manual-link:hover { box-shadow: 0 8px 26px rgba(108,92,231,.4); }
+
         .chips { display: flex; gap: .45rem; flex-wrap: wrap; justify-content: center; margin-top: 1.4rem; }
         .chip { padding: .3rem .75rem; border-radius: 50px; border: 1px solid var(--border); color: var(--muted); font-size: .7rem; cursor: pointer; background: none; transition: all .25s; }
         .chip:hover { border-color: var(--accent2); color: var(--accent2); transform: translateY(-1px); }
@@ -187,6 +197,7 @@
             </div>
 
             <div class="done-badge" id="done">✅ ডাউনলোড সম্পূর্ণ!</div>
+            <a id="manualLink" class="manual-link" style="display:none" href="#" download>👆 এই লিংকে চাপুন — ডাউনলোড শুরু হবে</a>
             <div class="err" id="err"></div>
 
             <p class="chips-label">💡 উদাহরণ (চাপলে অটো ফিল)</p>
@@ -213,6 +224,7 @@
         const url = $('url'), go = $('go');
         const pzone = $('pzone'), ring = $('ring'), pct = $('pct'), status = $('status');
         const info = $('info'), done = $('done'), err = $('err');
+        const manualLink = $('manualLink');
         const spd = $('spd'), eta = $('eta'), conn = $('conn'), threadsEl = $('threads');
 
         function fill(u) { url.value = u; url.focus(); }
@@ -234,6 +246,7 @@
         function reset() {
             err.classList.remove('show'); info.classList.remove('show');
             done.classList.remove('show'); pzone.classList.remove('show');
+            manualLink.classList.remove('show');
             threadsEl.classList.remove('show'); threadsEl.innerHTML = '';
             spd.textContent = '—'; eta.textContent = '—'; conn.textContent = '0';
         }
@@ -251,6 +264,14 @@
             ring.style.strokeDasharray = c;
             ring.style.strokeDashoffset = c * (1 - p / 100);
             pct.textContent = Math.min(100, Math.round(p)) + '%';
+        }
+
+        // fetch with a timeout so a hung chunk can't freeze the whole download
+        async function fetchTO(input, opts, ms) {
+            const ctrl = new AbortController();
+            const t = setTimeout(() => ctrl.abort(), ms);
+            try { return await fetch(input, Object.assign({}, opts, { signal: ctrl.signal })); }
+            finally { clearTimeout(t); }
         }
 
         // race the info probes across APIs; first answer wins (fastest endpoint)
@@ -307,7 +328,7 @@
                 let apiIdx = 0;
                 try {
                     apiIdx = await Promise.any(APIS.map((a, i) =>
-                        fetch(a + encodeURIComponent(u), { method: 'GET', headers: { 'Range': 'bytes=0-0' }, cache: 'no-store' })
+                        fetchTO(a + encodeURIComponent(u), { method: 'GET', headers: { 'Range': 'bytes=0-0' }, cache: 'no-store' }, 8000)
                             .then(r => { if (!r.ok && r.status !== 206) throw new Error('x'); r.body && r.body.cancel(); return i; })
                     ));
                 } catch (_) { apiIdx = 0; }
@@ -340,6 +361,12 @@
             a.href = link; a.download = meta.name;
             document.body.appendChild(a); a.click(); a.remove();
 
+            // Show the link directly too — Telegram/browser may block programmatic clicks,
+            // so give a tappable link as a guaranteed fallback.
+            manualLink.href = link;
+            manualLink.download = meta.name;
+            manualLink.classList.add('show');
+
             // animate progress (browser transfer is not measurable for cross-file saves)
             let p = 10;
             const iv = setInterval(() => {
@@ -362,7 +389,7 @@
             const n = starts.length;
             const parts = new Array(n);
             const partDone = new Array(n).fill(0);
-            let active = 0, nextQ = 0, finishedBytes = 0;
+            let active = 0, nextQ = 0, finishedBytes = 0, okChunks = 0;
             const t0 = performance.now();
             let stopped = false;
 
@@ -406,23 +433,30 @@
                     const sz = endB - startB + 1;
                     active++;
                     try {
-                        const r = await fetch(link, { headers: { 'Range': 'bytes=' + startB + '-' + endB } });
+                        const r = await fetchTO(link, { headers: { 'Range': 'bytes=' + startB + '-' + endB } }, 60000);
                         if (!r.ok && r.status !== 206) throw new Error('range failed');
                         const buf = await r.arrayBuffer();
                         parts[idx] = buf;
                         partDone[idx] = sz;
                         finishedBytes += buf.byteLength;
+                        okChunks++;
                     } catch (e) {
-                        // retry once on the next proxy
-                        const alt = APIS[(baseIdx + 1) % APIS.length];
-                        try {
-                            const r2 = await fetch(alt + encodeURIComponent(u), { headers: { 'Range': 'bytes=' + startB + '-' + endB } });
-                            if (!r2.ok && r2.status !== 206) throw new Error('retry failed');
-                            const buf = await r2.arrayBuffer();
-                            parts[idx] = buf; partDone[idx] = sz; finishedBytes += buf.byteLength;
-                        } catch (e2) {
+                        // try each alternate proxy until one works
+                        let saved = false;
+                        for (let k = 1; k < APIS.length; k++) {
+                            const alt = APIS[(baseIdx + k) % APIS.length];
+                            try {
+                                const r2 = await fetchTO(alt + encodeURIComponent(u), { headers: { 'Range': 'bytes=' + startB + '-' + endB } }, 60000);
+                                if (!r2.ok && r2.status !== 206) continue;
+                                const buf = await r2.arrayBuffer();
+                                parts[idx] = buf; partDone[idx] = sz;
+                                finishedBytes += buf.byteLength; okChunks++; saved = true;
+                                break;
+                            } catch (_) {}
+                        }
+                        if (!saved) {
                             stopped = true;
-                            showErr('চাঙ্ক ডাউনলোড ব্যর্থ: ' + (e2.message || 'unknown'));
+                            showErr('চাঙ্ক ডাউনলোড ব্যর্থ — ফাইলটি সার্ভার দিচ্ছে না');
                             return;
                         }
                     } finally { active--; }
@@ -435,7 +469,16 @@
             for (let i = 0; i < nThreads; i++) workers.push(worker(i));
             await Promise.all(workers);
 
-            if (stopped) { pzone.classList.remove('show'); return; }
+            if (stopped || okChunks < n) {
+                // Some chunks failed even after retries — fall back to a direct stream save.
+                if (finishedBytes > 0) {
+                    status.innerHTML = '⚠️ কিছু অংশ ব্যর্থ — ডিরেক্ট মোডে চেষ্টা করুন';
+                    manualLink.href = link;
+                    manualLink.download = meta.name;
+                    manualLink.classList.add('show');
+                }
+                return;
+            }
 
             setRing(100);
             status.innerHTML = '🧩 ফাইল একত্র করা হচ্ছে...';
@@ -444,7 +487,11 @@
             const a = document.createElement('a');
             a.href = blobUrl; a.download = meta.name;
             document.body.appendChild(a); a.click(); a.remove();
-            setTimeout(() => URL.revokeObjectURL(blobUrl), 4000);
+            // Always expose the assembled blob as a tappable link too (Telegram in-app browser fix)
+            manualLink.href = blobUrl;
+            manualLink.download = meta.name;
+            manualLink.classList.add('show');
+            setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
 
             const el = (performance.now() - t0) / 1000;
             status.innerHTML = '✅ সম্পূর্ণ! <b>' + fmtSize(total) + '</b> / ' + el.toFixed(1) + ' সেকেন্ডে';
