@@ -6,14 +6,14 @@
     <title>Video Downloader — V4ZRASHD</title>
     <script defer src="/_vercel/insights/script.js"></script>
     <style>
-        :root { --bg:#0a0a0f; --card:#1a1a24; --accent:#6c5ce7; --accent2:#00cec9; --text:#e9e9f0; --muted:#8b8ba3; --border:#2a2a38; }
+        :root { --bg:#0a0a0f; --card:#1a1a24; --accent:#6c5ce7; --accent2:#00cec9; --accent3:#fd79a8; --text:#e9e9f0; --muted:#8b8ba3; --border:#2a2a38; }
         * { margin:0; padding:0; box-sizing:border-box; }
         body { background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui,sans-serif; min-height:100vh; display:flex; align-items:flex-start; justify-content:center; padding:5rem 1.5rem 2rem; }
-        .container { max-width:560px; width:100%; }
+        .container { max-width:580px; width:100%; }
         .card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:2rem; }
         h1 { font-size:1.5rem; margin-bottom:0.25rem; text-align:center; }
         h1 span { background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-        .sub { color:var(--muted); font-size:0.85rem; margin-bottom:1.5rem; text-align:center; }
+        .sub { color:var(--muted); font-size:0.85rem; margin-bottom:1.25rem; text-align:center; }
         input[type=url] { width:100%; background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:0.85rem 1rem; color:var(--text); font-size:0.95rem; margin-bottom:0.75rem; outline:none; transition:border-color 0.3s; }
         input[type=url]:focus { border-color:var(--accent); }
         .row { display:flex; gap:0.75rem; }
@@ -22,24 +22,24 @@
         .btn-gen:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(108,92,231,0.4); }
         .btn-gen:disabled { opacity:0.5; cursor:wait; transform:none; }
         .btn-audio { background:transparent; border:1px solid var(--border); color:var(--muted); }
-        .btn-audio:hover { border-color:var(--accent3); color:#fd79a8; }
-        .platforms { display:flex; gap:0.5rem; flex-wrap:wrap; margin:1rem 0; justify-content:center; }
-        .platform { padding:0.4rem 0.8rem; border-radius:50px; border:1px solid var(--border); color:var(--muted); font-size:0.75rem; }
+        .btn-audio:hover { border-color:var(--accent3); color:var(--accent3); }
+        .platforms { display:flex; gap:0.5rem; flex-wrap:wrap; margin:0.75rem 0 1.25rem; justify-content:center; }
+        .platform { padding:0.35rem 0.75rem; border-radius:50px; border:1px solid var(--border); color:var(--muted); font-size:0.72rem; }
         .result { background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:1rem; margin-top:1rem; display:none; }
         .result.show { display:block; }
-        .result-title { font-size:0.95rem; margin-bottom:0.75rem; }
+        .result-thumb { width:100%; border-radius:10px; margin-bottom:0.75rem; max-height:200px; object-fit:cover; }
+        .result-title { font-size:0.95rem; margin-bottom:0.5rem; line-height:1.4; }
+        .result-meta { font-size:0.75rem; color:var(--muted); margin-bottom:0.75rem; }
         .dl-link { display:flex; align-items:center; gap:0.75rem; background:var(--card); border:1px solid var(--border); border-radius:10px; padding:0.75rem 1rem; margin-bottom:0.5rem; text-decoration:none; color:var(--text); transition:all 0.3s; }
         .dl-link:hover { border-color:var(--accent2); transform:translateX(4px); }
         .dl-icon { font-size:1.25rem; }
-        .dl-info { flex:1; }
+        .dl-info { flex:1; min-width:0; }
         .dl-quality { font-size:0.85rem; font-weight:600; }
         .dl-size { font-size:0.72rem; color:var(--muted); }
         .dl-arrow { color:var(--accent2); font-size:1.1rem; }
         .err { color:#e74c3c; font-size:0.85rem; margin-top:0.75rem; display:none; text-align:center; }
         .spinner { display:inline-block; width:14px; height:14px; border:2px solid rgba(255,255,255,0.3); border-top-color:white; border-radius:50%; animation:spin 0.8s linear infinite; vertical-align:middle; margin-right:0.4rem; }
         @keyframes spin { to { transform:rotate(360deg); } }
-        .thumb { width:100%; border-radius:10px; margin-bottom:0.75rem; display:none; }
-        .thumb.show { display:block; }
         .telegram-note { margin-top:1.25rem; padding:0.85rem 1rem; background:rgba(34,158,217,0.08); border:1px solid rgba(34,158,217,0.3); border-radius:10px; font-size:0.8rem; color:var(--muted); text-align:center; }
         .telegram-note a { color:#229ED9; text-decoration:none; font-weight:600; }
         .back { text-align:center; margin-top:1.5rem; }
@@ -56,11 +56,11 @@
                 <span class="platform">📸 Instagram</span>
                 <span class="platform">🎵 TikTok</span>
                 <span class="platform">🐦 Twitter/X</span>
-                <span class="platform">🎯 Facebook</span>
                 <span class="platform">🎙️ Reddit</span>
+                <span class="platform">📘 Facebook</span>
             </div>
             <form onsubmit="download(event, 'video')">
-                <input type="url" id="url" placeholder="https://youtube.com/watch?v=..." required>
+                <input type="url" id="url" placeholder="https://youtube.com/watch?v=... লিংক দিন" required>
                 <div class="row">
                     <button class="btn btn-gen" id="btn" type="submit">🎬 ভিডিও ডাউনলোড</button>
                     <button class="btn btn-audio" type="button" onclick="download(event,'audio')">🎵 MP3</button>
@@ -68,12 +68,13 @@
             </form>
             <div class="err" id="err"></div>
             <div class="result" id="result">
-                <img class="thumb" id="thumb" alt="thumbnail">
+                <img class="result-thumb" id="thumb" alt="">
                 <div class="result-title" id="resultTitle"></div>
+                <div class="result-meta" id="resultMeta"></div>
                 <div id="links"></div>
             </div>
             <div class="telegram-note">
-                💡 বড় ভিডিও (৪৫MB+) এর জন্য আমার টেলিগ্রাম বট ব্যবহার করুন — <a href="https://t.me/v4zvideodownloadbot" target="_blank">@v4zvideodownloadbot</a>
+                💡 বড় ভিডিও (৪৫MB+) বা এই পেজে না পেলে আমার টেলিগ্রাম বট ব্যবহার করুন — <a href="https://t.me/v4zvideodownloadbot" target="_blank">@v4zvideodownloadbot</a>
             </div>
         </div>
         <div class="back"><a href="/">← হোমে ফিরুন</a></div>
@@ -81,6 +82,31 @@
 
     <script>
         let mode = 'video';
+        const PIPED = 'https://api.piped.private.coffee';
+        const TIKWM = 'https://www.tikwm.com/api/';
+
+        function detectPlatform(url) {
+            const u = url.toLowerCase();
+            if (u.includes('youtube.com') || u.includes('youtu.be')) return 'youtube';
+            if (u.includes('tiktok.com')) return 'tiktok';
+            if (u.includes('instagram.com')) return 'instagram';
+            if (u.includes('twitter.com') || u.includes('x.com')) return 'twitter';
+            if (u.includes('reddit.com')) return 'reddit';
+            if (u.includes('facebook.com') || u.includes('fb.watch')) return 'facebook';
+            return 'unknown';
+        }
+
+        function extractYouTubeId(url) {
+            const patterns = [
+                /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/
+            ];
+            for (const p of patterns) {
+                const m = url.match(p);
+                if (m) return m[1];
+            }
+            return null;
+        }
+
         async function download(e, m) {
             e.preventDefault();
             mode = m;
@@ -88,71 +114,105 @@
             const btn = document.getElementById('btn');
             const err = document.getElementById('err');
             const res = document.getElementById('result');
-            err.style.display = 'none'; res.classList.remove('show');
+            err.style.display = 'none';
+            res.classList.remove('show');
             btn.disabled = true;
-            btn.innerHTML = '<span class="spinner"></span>Fetching...';
+            btn.innerHTML = '<span class="spinner"></span>ডাউনলোড খোঁজা হচ্ছে...';
             try {
-                const r = await fetch('https://api.cobalt.tools/api/json', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        url: url,
-                        isAudioOnly: m === 'audio'
-                    })
-                });
-                const d = await r.json();
-                if (d.status === 'error' || d.status === 'rate-limit') {
-                    throw new Error(d.text && d.text !== 'error.api.generic' ? d.text : 'এই লিংক থেকে ডাউনলোড করা যায়নি');
-                }
-                showResult(d, url);
+                const platform = detectPlatform(url);
+                if (platform === 'youtube') await doYouTube(url);
+                else if (platform === 'tiktok') await doTikTok(url);
+                else throw new Error('এই প্ল্যাটফর্মটি এখনো সাপোর্ট করে না। YouTube বা TikTok লিংক দিন।');
             } catch (ex) {
                 err.textContent = '❌ ' + (ex.message || 'ডাউনলোড ব্যর্থ। লিংক সঠিক কিনা দেখুন।');
                 err.style.display = 'block';
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = mode === 'audio' ? '🎵 MP3' : '🎬 ভিডিও ডাউনলোড';
+                btn.innerHTML = '🎬 ভিডিও ডাউনলোড';
             }
         }
-        function showResult(d, url) {
+
+        function showResult(thumb, title, meta) {
             const res = document.getElementById('result');
-            const title = document.getElementById('resultTitle');
+            const t = document.getElementById('thumb');
+            if (thumb) { t.src = thumb; t.style.display = 'block'; } else { t.style.display = 'none'; }
+            document.getElementById('resultTitle').textContent = title;
+            document.getElementById('resultMeta').textContent = meta;
+            document.getElementById('links').innerHTML = '';
+            res.classList.add('show');
+        }
+
+        function addLink(url, icon, quality, size, filename) {
             const links = document.getElementById('links');
-            const thumb = document.getElementById('thumb');
-            links.innerHTML = '';
-            if (d.status === 'redirect' || d.status === 'tunnel' || d.status === 'picker') {
-                if (d.status === 'picker' && d.picker && d.picker.length) {
-                    title.textContent = '📋 একাধিক ভিডিও পাওয়া গেছে — বেছে নিন:';
-                    d.picker.forEach(function(p, i) {
-                        const a = document.createElement('a');
-                        a.className = 'dl-link';
-                        a.href = p.url; a.target = '_blank';
-                        a.innerHTML = '<span class="dl-icon">🎬</span><div class="dl-info"><div class="dl-quality">ভিডিও ' + (i+1) + '</div><div class="dl-size">' + (p.thumb ? 'ছবি সহ' : 'ডাউনলোড করুন') + '</div></div><span class="dl-arrow">⬇️</span>';
-                        links.appendChild(a);
-                    });
-                } else {
-                    title.textContent = '✅ ডাউনলোড প্রস্তুত!';
-                    const a = document.createElement('a');
-                    a.className = 'dl-link';
-                    a.href = d.url; a.target = '_blank';
-                    const fn = d.filename || 'video.mp4';
-                    a.innerHTML = '<span class="dl-icon">' + (mode === 'audio' ? '🎵' : '🎬') + '</span><div class="dl-info"><div class="dl-quality">' + fn + '</div><div class="dl-size">ক্লিক করে ডাউনলোড করুন</div></div><span class="dl-arrow">⬇️</span>';
-                    links.appendChild(a);
+            const a = document.createElement('a');
+            a.className = 'dl-link';
+            a.href = url; a.target = '_blank'; a.download = filename || '';
+            a.innerHTML = '<span class="dl-icon">' + icon + '</span><div class="dl-info"><div class="dl-quality">' + quality + '</div><div class="dl-size">' + size + '</div></div><span class="dl-arrow">⬇️</span>';
+            links.appendChild(a);
+        }
+
+        function fmtSize(bytes) {
+            if (!bytes) return '';
+            const mb = bytes / (1024 * 1024);
+            if (mb < 1) return Math.round(bytes / 1024) + ' KB';
+            return mb.toFixed(1) + ' MB';
+        }
+
+        function fmtDuration(sec) {
+            if (!sec) return '';
+            const m = Math.floor(sec / 60), s = sec % 60;
+            return m + ':' + String(s).padStart(2, '0');
+        }
+
+        async function doYouTube(url) {
+            const vid = extractYouTubeId(url);
+            if (!vid) throw new Error('সঠিক YouTube লিংক দিন');
+            const r = await fetch(PIPED + '/streams/' + vid, { headers: { 'Accept': 'application/json' } });
+            if (!r.ok) throw new Error('ভিডিও তথ্য পাওয়া যায়নি');
+            const d = await r.json();
+            if (d.error) throw new Error(d.error);
+            const title = d.title || 'YouTube Video';
+            showResult(d.thumbnailUrl, title, '⏱ ' + fmtDuration(d.duration) + ' | ▶️ YouTube');
+            if (mode === 'audio') {
+                const audios = (d.audioStreams || []).filter(function(a){ return a.mimeType && a.mimeType.includes('mp4'); });
+                if (audios.length) {
+                    const a = audios[0];
+                    addLink(a.url, '🎵', 'MP3 অডিও', a.quality || '', title + '.mp3');
+                    return;
                 }
-                res.classList.add('show');
-            } else if (d.url) {
-                title.textContent = '✅ ডাউনলোড প্রস্তুত!';
-                const a = document.createElement('a');
-                a.className = 'dl-link';
-                a.href = d.url; a.target = '_blank';
-                a.innerHTML = '<span class="dl-icon">' + (mode === 'audio' ? '🎵' : '🎬') + '</span><div class="dl-info"><div class="dl-quality">' + (d.filename || 'video') + '</div><div class="dl-size">ক্লিক করে ডাউনলোড করুন</div></div><span class="dl-arrow">⬇️</span>';
-                links.appendChild(a);
-                res.classList.add('show');
-            } else {
-                throw new Error('অপ্রত্যাশিত সার্ভার সাড়া');
+                // fallback: use LBRY video if no audio
+                const lbry = (d.videoStreams || []).find(function(v){ return v.quality === 'LBRY' && v.mimeType.includes('mp4'); });
+                if (lbry) addLink(lbry.url, '🎬', 'ভিডিও (অডিও নেই)', 'LBRY', title + '.mp4');
+                return;
             }
+            // video mode
+            const vids = (d.videoStreams || []).filter(function(v){ return v.mimeType && v.mimeType.includes('mp4') && v.url; });
+            const seen = {};
+            vids.forEach(function(v) {
+                const q = v.quality;
+                if (seen[q]) return;
+                seen[q] = true;
+                const isLbry = q.includes('LBRY');
+                addLink(v.url, '🎬', isLbry ? 'সর্বোচ্চ কোয়ালিটি (LBRY)' : q + ' MP4', fmtSize(v.bitrate ? v.bitrate * d.duration / 8 : 0), title + '.mp4');
+            });
+            if (!vids.length) throw new Error('কোনো ডাউনলোডযোগ্য স্ট্রিম পাওয়া যায়নি');
+        }
+
+        async function doTikTok(url) {
+            const r = await fetch(TIKWM + '?url=' + encodeURIComponent(url), { headers: { 'Accept': 'application/json' } });
+            if (!r.ok) throw new Error('TikTok ভিডিও তথ্য পাওয়া যায়নি');
+            const d = await r.json();
+            if (d.code !== 0 || !d.data) throw new Error(d.msg || 'TikTok ভিডিও পাওয়া যায়নি');
+            const data = d.data;
+            const title = (data.title || 'TikTok Video').slice(0, 100);
+            showResult(data.cover, title, '⏱ ' + fmtDuration(data.duration) + ' | 🎵 TikTok');
+            if (mode === 'audio') {
+                if (data.music) addLink(data.music, '🎵', 'MP3 অডিও', fmtSize(0), (data.music_info && data.music_info.title || 'audio') + '.mp3');
+                return;
+            }
+            if (data.play) addLink(data.play, '🎬', 'ওয়াটারমার্ক ছাড়া', fmtSize(data.size), title.slice(0, 40) + '.mp4');
+            if (data.wmplay) addLink(data.wmplay, '🎬', 'ওয়াটারমার্ক সহ', fmtSize(data.wm_size), title.slice(0, 40) + '_wm.mp4');
+            if (data.hdplay) addLink(data.hdplay, '✨', 'HD কোয়ালিটি', '', title.slice(0, 40) + '_hd.mp4');
         }
     </script>
 </body>
