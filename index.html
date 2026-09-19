@@ -219,6 +219,7 @@
         const PARALLEL = 8;       // concurrent chunk downloads
         const CHUNK = 4 * 1048576; // 4 MB per chunk
         const MAX_PARALLEL_RAM = 600 * 1048576; // above this, use direct stream instead of RAM assembly
+        const FS_ACCESS = 'showSaveFilePicker' in window; // direct-to-disk save (gallery)
 
         const $ = id => document.getElementById(id);
         const url = $('url'), go = $('go');
@@ -382,19 +383,39 @@
         }
 
         // ---- parallel chunked download: N connections at once ----
+        // Writes straight to disk via File System Access API (Chrome/Edge/Android):
+        // chunks land in the chosen file as they arrive -> 100% = already in gallery/files.
         async function parallelDownload(u, meta, PROXY) {
             const total = meta.size;
             const starts = [];
             for (let s = 0; s < total; s += CHUNK) starts.push(s);
             const n = starts.length;
-            const parts = new Array(n);
             const partDone = new Array(n).fill(0);
             let active = 0, nextQ = 0, finishedBytes = 0, okChunks = 0;
             const t0 = performance.now();
             let stopped = false;
+            let handle = null, fileStream = null;
+
+            const nThreads = Math.min(PARALLEL, n);
+
+            // Try to open a real file on disk (this is what makes it land in the gallery)
+            if (FS_ACCESS) {
+                try {
+                    handle = await window.showSaveFilePicker({
+                        suggestedName: meta.name,
+                        types: [{ description: 'ফাইল', accept: { [meta.type || 'application/octet-stream']: ['.' + (meta.name.split('.').pop() || 'bin')] } }],
+                    });
+                    fileStream = await handle.createWritable();
+                } catch (e) {
+                    // user cancelled or unsupported -> fall back to blob + link
+                    handle = null; fileStream = null;
+                }
+            }
+
+            // RAM array only used when direct disk writing isn't available
+            const partsRAM = fileStream ? null : new Array(n);
 
             // per-thread bars
-            const nThreads = Math.min(PARALLEL, n);
             for (let i = 0; i < nThreads; i++) {
                 const el = document.createElement('div');
                 el.className = 'thread';
@@ -436,12 +457,17 @@
                         const r = await fetchTO(link, { headers: { 'Range': 'bytes=' + startB + '-' + endB } }, 60000);
                         if (!r.ok && r.status !== 206) throw new Error('range failed');
                         const buf = await r.arrayBuffer();
-                        parts[idx] = buf;
                         partDone[idx] = sz;
                         finishedBytes += buf.byteLength;
                         okChunks++;
+                        // write this chunk straight to disk at its offset
+                        if (fileStream) {
+                            await fileStream.seek(startB);
+                            await fileStream.write(buf);
+                        } else {
+                            partsRAM[idx] = buf;
+                        }
                     } catch (e) {
-                        // try each alternate proxy until one works
                         let saved = false;
                         for (let k = 1; k < APIS.length; k++) {
                             const alt = APIS[(baseIdx + k) % APIS.length];
@@ -449,8 +475,14 @@
                                 const r2 = await fetchTO(alt + encodeURIComponent(u), { headers: { 'Range': 'bytes=' + startB + '-' + endB } }, 60000);
                                 if (!r2.ok && r2.status !== 206) continue;
                                 const buf = await r2.arrayBuffer();
-                                parts[idx] = buf; partDone[idx] = sz;
+                                partDone[idx] = sz;
                                 finishedBytes += buf.byteLength; okChunks++; saved = true;
+                                if (fileStream) {
+                                    await fileStream.seek(startB);
+                                    await fileStream.write(buf);
+                                } else {
+                                    partsRAM[idx] = buf;
+                                }
                                 break;
                             } catch (_) {}
                         }
@@ -464,13 +496,15 @@
                 }
             }
 
-            status.innerHTML = '⚡ <b>' + nThreads + 'x</b> প্যারালালে ডাউনলোড হচ্ছে...';
+            status.innerHTML = fileStream
+                ? '💾 ডিস্কে লেখা হচ্ছে — <b>' + nThreads + 'x</b> প্যারালালে...'
+                : '⚡ <b>' + nThreads + 'x</b> প্যারালালে ডাউনলোড হচ্ছে...';
             const workers = [];
             for (let i = 0; i < nThreads; i++) workers.push(worker(i));
             await Promise.all(workers);
 
             if (stopped || okChunks < n) {
-                // Some chunks failed even after retries — fall back to a direct stream save.
+                if (fileStream) { try { await fileStream.abort(); } catch (_) {} }
                 if (finishedBytes > 0) {
                     status.innerHTML = '⚠️ কিছু অংশ ব্যর্থ — ডিরেক্ট মোডে চেষ্টা করুন';
                     manualLink.href = link;
@@ -481,13 +515,28 @@
             }
 
             setRing(100);
-            status.innerHTML = '🧩 ফাইল একত্র করা হচ্ছে...';
-            const blob = new Blob(parts, { type: meta.type || 'application/octet-stream' });
+
+            if (fileStream) {
+                // everything is already on disk — just close the file
+                await fileStream.close();
+                const el = (performance.now() - t0) / 1000;
+                status.innerHTML = '✅ গ্যালারিতে সেভ হয়েছে! <b>' + fmtSize(total) + '</b> / ' + el.toFixed(1) + ' সেকেন্ডে';
+                $('done').textContent = '✅ ফাইল সেভ সম্পূর্ণ — গ্যালারি/ফাইলস দেখুন!';
+                $('done').classList.add('show');
+                updateUI();
+                return;
+            }
+
+            // Fallback: assemble in RAM and save via blob (or tappable link in Telegram)
+            status.innerHTML = '🧫 ফাইল একত্র করা হচ্ছে...';
+            const blob = new Blob(partsRAM, { type: meta.type || 'application/octet-stream' });
             const blobUrl = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = blobUrl; a.download = meta.name;
-            document.body.appendChild(a); a.click(); a.remove();
-            // Always expose the assembled blob as a tappable link too (Telegram in-app browser fix)
+            try {
+                if (navigator.userAgent.indexOf('Telegram') > -1 || !('download' in document.createElement('a'))) throw new Error('skip');
+                const a = document.createElement('a');
+                a.href = blobUrl; a.download = meta.name;
+                document.body.appendChild(a); a.click(); a.remove();
+            } catch (_) {}
             manualLink.href = blobUrl;
             manualLink.download = meta.name;
             manualLink.classList.add('show');
