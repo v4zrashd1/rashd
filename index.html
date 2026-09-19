@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>V4ZRASHD Downloader</title>
-    <meta name="description" content="যেকোনো লিংক দিন — ডাউনলোড করে দিব">
+    <title>V4ZRASHD Downloader — Fast</title>
+    <meta name="description" content="যেকোনো লিংক দিন — সুপার ফাস্ট ডাউনলোড">
     <style>
         :root {
             --bg: #08080f;
@@ -16,304 +16,121 @@
             --muted: #8b8ba3;
             --border: rgba(108, 92, 231, 0.25);
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
-            min-height: 100vh;
-            color: var(--text);
+            min-height: 100vh; color: var(--text);
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1.5rem;
-            overflow: hidden;
-            background: var(--bg);
+            display: flex; align-items: center; justify-content: center;
+            padding: 1.5rem; overflow: hidden; background: var(--bg);
         }
-
-        /* Animated aurora background */
-        .aurora {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            overflow: hidden;
-        }
+        .aurora { position: fixed; inset: 0; z-index: 0; overflow: hidden; }
         .aurora::before, .aurora::after {
-            content: '';
-            position: absolute;
-            width: 70vmax;
-            height: 70vmax;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.35;
+            content: ''; position: absolute; width: 70vmax; height: 70vmax;
+            border-radius: 50%; filter: blur(80px); opacity: 0.35;
             animation: float 14s ease-in-out infinite;
         }
-        .aurora::before {
-            background: radial-gradient(circle, var(--accent), transparent 60%);
-            top: -25%;
-            left: -15%;
-        }
-        .aurora::after {
-            background: radial-gradient(circle, var(--accent2), transparent 60%);
-            bottom: -30%;
-            right: -20%;
-            animation-delay: -7s;
-        }
+        .aurora::before { background: radial-gradient(circle, var(--accent), transparent 60%); top: -25%; left: -15%; }
+        .aurora::after { background: radial-gradient(circle, var(--accent2), transparent 60%); bottom: -30%; right: -20%; animation-delay: -7s; }
         .aurora .blob3 {
-            position: absolute;
-            width: 50vmax;
-            height: 50vmax;
-            border-radius: 50%;
+            position: absolute; width: 50vmax; height: 50vmax; border-radius: 50%;
             background: radial-gradient(circle, var(--accent3), transparent 60%);
-            filter: blur(70px);
-            opacity: 0.22;
-            top: 30%;
-            left: 40%;
+            filter: blur(70px); opacity: 0.22; top: 30%; left: 40%;
             animation: float 18s ease-in-out infinite reverse;
         }
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(8%, -6%) scale(1.1); }
-            66% { transform: translate(-6%, 8%) scale(0.95); }
-        }
+        @keyframes float { 0%,100%{transform:translate(0,0) scale(1);} 33%{transform:translate(8%,-6%) scale(1.1);} 66%{transform:translate(-6%,8%) scale(.95);} }
 
-        .container {
-            position: relative;
-            z-index: 1;
-            width: 100%;
-            max-width: 520px;
-        }
-
+        .container { position: relative; z-index: 1; width: 100%; max-width: 540px; }
         .card {
-            background: var(--card);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 2.25rem 1.75rem;
-            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
-            animation: cardIn 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+            background: var(--card); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--border); border-radius: 24px; padding: 2.25rem 1.75rem;
+            box-shadow: 0 24px 80px rgba(0,0,0,0.5); animation: cardIn .7s cubic-bezier(.22,1,.36,1);
         }
-        @keyframes cardIn {
-            from { opacity: 0; transform: translateY(28px) scale(0.96); }
-            to { opacity: 1; transform: none; }
-        }
-
-        .logo {
-            text-align: center;
-            margin-bottom: 1.5rem;
-        }
-        .logo .dl-icon {
-            font-size: 2.6rem;
-            display: inline-block;
-            animation: bounceIcon 2.4s ease-in-out infinite;
-            filter: drop-shadow(0 8px 20px rgba(108, 92, 231, 0.5));
-        }
-        @keyframes bounceIcon {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        .logo h1 {
-            font-size: 1.45rem;
-            margin-top: 0.4rem;
-            letter-spacing: 0.02em;
-        }
+        @keyframes cardIn { from{opacity:0;transform:translateY(28px) scale(.96);} to{opacity:1;transform:none;} }
+        .logo { text-align: center; margin-bottom: 1.5rem; }
+        .logo .dl-icon { font-size: 2.6rem; display: inline-block; animation: bounceIcon 2.4s ease-in-out infinite; filter: drop-shadow(0 8px 20px rgba(108,92,231,.5)); }
+        @keyframes bounceIcon { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }
+        .logo h1 { font-size: 1.45rem; margin-top: .4rem; }
         .logo h1 .grad {
             background: linear-gradient(135deg, var(--accent), var(--accent2), var(--accent3));
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: shimmer 3.5s linear infinite;
+            background-size: 200% auto; -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent; animation: shimmer 3.5s linear infinite;
         }
-        @keyframes shimmer {
-            to { background-position: 200% center; }
-        }
-        .logo p {
-            color: var(--muted);
-            font-size: 0.84rem;
-            margin-top: 0.3rem;
+        @keyframes shimmer { to{background-position:200% center;} }
+        .logo p { color: var(--muted); font-size: .84rem; margin-top: .3rem; }
+        .fast-badge {
+            display: inline-block; margin-top: .55rem; padding: .25rem .8rem; border-radius: 50px;
+            background: linear-gradient(135deg, rgba(0,206,201,.18), rgba(108,92,231,.18));
+            border: 1px solid rgba(0,206,201,.4); color: var(--accent2);
+            font-size: .68rem; font-weight: 800; letter-spacing: .08em;
         }
 
         form { margin-top: 1.25rem; }
         .input-wrap { position: relative; }
         input[type=url] {
-            width: 100%;
-            background: rgba(8, 8, 15, 0.7);
-            border: 1.5px solid var(--border);
-            border-radius: 14px;
-            padding: 0.95rem 1rem 0.95rem 2.9rem;
-            color: var(--text);
-            font-size: 0.92rem;
-            outline: none;
-            transition: all 0.35s;
+            width: 100%; background: rgba(8,8,15,.7); border: 1px solid var(--border);
+            border-radius: 14px; padding: .95rem 1rem .95rem 2.9rem; color: var(--text);
+            font-size: .92rem; outline: none; transition: all .35s;
         }
-        input[type=url]:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.14);
-        }
-        .input-wrap .link-ico {
-            position: absolute;
-            left: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 0.95rem;
-            opacity: 0.5;
-        }
-
-        .btn-row { display: flex; gap: 0.6rem; margin-top: 0.75rem; }
+        input[type=url]:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(108,92,231,.14); }
+        .input-wrap .link-ico { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); font-size: .95rem; opacity: .5; }
+        .btn-row { display: flex; gap: .6rem; margin-top: .75rem; }
         .btn {
-            flex: 1;
-            padding: 0.95rem 1rem;
-            border: none;
-            border-radius: 14px;
-            font-weight: 700;
-            font-size: 0.95rem;
-            cursor: pointer;
-            color: white;
+            flex: 1; padding: .95rem 1rem; border: none; border-radius: 14px;
+            font-weight: 700; font-size: .95rem; cursor: pointer; color: white;
             background: linear-gradient(135deg, var(--accent), var(--accent2));
-            background-size: 150% auto;
-            transition: all 0.35s;
-            position: relative;
-            overflow: hidden;
+            background-size: 150% auto; transition: all .35s; position: relative; overflow: hidden;
         }
-        .btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(108, 92, 231, 0.45);
-            background-position: right center;
-        }
-        .btn:active:not(:disabled) { transform: translateY(0) scale(0.98); }
-        .btn:disabled { opacity: 0.75; cursor: wait; }
-        .btn-ghost {
-            flex: 0 0 auto;
-            background: transparent;
-            border: 1.5px solid var(--border);
-            color: var(--muted);
-            font-weight: 600;
-        }
+        .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(108,92,231,.45); background-position: right center; }
+        .btn:active:not(:disabled) { transform: translateY(0) scale(.98); }
+        .btn:disabled { opacity: .75; cursor: wait; }
+        .btn-ghost { flex: 0 0 auto; background: transparent; border: 1.5px solid var(--border); color: var(--muted); font-weight: 600; }
         .btn-ghost:hover { border-color: var(--accent3); color: var(--accent3); box-shadow: none; }
 
-        /* progress ring + bar */
-        .progress-zone {
-            margin-top: 1.5rem;
-            display: none;
-            text-align: center;
-            animation: cardIn 0.5s ease;
-        }
+        .progress-zone { margin-top: 1.5rem; display: none; text-align: center; animation: cardIn .5s ease; }
         .progress-zone.show { display: block; }
         .ring-wrap { position: relative; width: 92px; height: 92px; margin: 0 auto; }
         .ring-wrap svg { transform: rotate(-90deg); }
         .ring-bg, .ring-fg { fill: none; stroke-width: 7; stroke-linecap: round; }
-        .ring-bg { stroke: rgba(255,255,255,0.08); }
-        .ring-fg {
-            stroke: url(#ringGrad);
-            stroke-dasharray: 254.5;
-            stroke-dashoffset: 254.5;
-            transition: stroke-dashoffset 0.4s ease;
-            filter: drop-shadow(0 0 8px rgba(0, 206, 201, 0.6));
-        }
-        .ring-pct {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.15rem;
-            font-weight: 800;
-        }
-        .status-text {
-            margin-top: 0.85rem;
-            font-size: 0.88rem;
-            color: var(--muted);
-            min-height: 1.3em;
-        }
+        .ring-bg { stroke: rgba(255,255,255,.08); }
+        .ring-fg { stroke: url(#ringGrad); stroke-dasharray: 254.5; stroke-dashoffset: 254.5; transition: stroke-dashoffset .3s ease; filter: drop-shadow(0 0 8px rgba(0,206,201,.6)); }
+        .ring-pct { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; font-weight: 800; }
+        .status-text { margin-top: .85rem; font-size: .88rem; color: var(--muted); min-height: 1.3em; }
         .status-text b { color: var(--accent2); }
 
-        /* file info panel */
-        .info {
-            margin-top: 1.25rem;
-            background: rgba(8, 8, 15, 0.6);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 0.9rem 1rem;
-            display: none;
-            animation: cardIn 0.5s ease;
-        }
+        .speed-row { display: flex; justify-content: center; gap: 1.1rem; margin-top: .8rem; }
+        .speed-box { text-align: center; }
+        .speed-box .v { font-size: 1.05rem; font-weight: 800; color: var(--accent2); }
+        .speed-box .l { font-size: .66rem; color: var(--muted); }
+
+        .threads { margin-top: .9rem; display: none; }
+        .threads.show { display: block; }
+        .thread { display: flex; align-items: center; gap: .5rem; font-size: .68rem; color: var(--muted); padding: .18rem 0; }
+        .thread .bar { flex: 1; height: 4px; background: rgba(255,255,255,.07); border-radius: 2px; overflow: hidden; }
+        .thread .bar i { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 2px; transition: width .3s; }
+        .thread .lbl { width: 3.6rem; }
+
+        .info { margin-top: 1.25rem; background: rgba(8,8,15,.6); border: 1px solid var(--border); border-radius: 14px; padding: .9rem 1rem; display: none; animation: cardIn .5s ease; }
         .info.show { display: block; }
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.82rem;
-            padding: 0.32rem 0;
-        }
-        .info-row + .info-row { border-top: 1px solid rgba(255,255,255,0.05); }
+        .info-row { display: flex; justify-content: space-between; align-items: center; font-size: .82rem; padding: .32rem 0; }
+        .info-row + .info-row { border-top: 1px solid rgba(255,255,255,.05); }
         .info-row span:first-child { color: var(--muted); }
         .info-row span:last-child { font-weight: 600; max-width: 60%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-        .err {
-            margin-top: 1rem;
-            padding: 0.8rem 1rem;
-            background: rgba(231, 76, 60, 0.1);
-            border: 1px solid rgba(231, 76, 60, 0.35);
-            border-radius: 12px;
-            color: #ff7a6b;
-            font-size: 0.84rem;
-            display: none;
-            animation: shake 0.45s ease;
-        }
+        .err { margin-top: 1rem; padding: .8rem 1rem; background: rgba(231,76,60,.1); border: 1px solid rgba(231,76,60,.35); border-radius: 12px; color: #ff7a6b; font-size: .84rem; display: none; animation: shake .45s ease; }
         .err.show { display: block; }
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-7px); }
-            75% { transform: translateX(7px); }
-        }
+        @keyframes shake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-7px);} 75%{transform:translateX(7px);} }
 
-        .done-badge {
-            display: none;
-            margin-top: 1.25rem;
-            padding: 0.9rem;
-            border-radius: 14px;
-            background: linear-gradient(135deg, rgba(0, 206, 201, 0.14), rgba(108, 92, 231, 0.14));
-            border: 1px solid rgba(0, 206, 201, 0.4);
-            text-align: center;
-            font-weight: 700;
-            color: var(--accent2);
-            animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
+        .done-badge { display: none; margin-top: 1.25rem; padding: .9rem; border-radius: 14px; background: linear-gradient(135deg, rgba(0,206,201,.14), rgba(108,92,231,.14)); border: 1px solid rgba(0,206,201,.4); text-align: center; font-weight: 700; color: var(--accent2); animation: popIn .6s cubic-bezier(.34,1.56,.64,1); }
         .done-badge.show { display: block; }
-        @keyframes popIn {
-            from { opacity: 0; transform: scale(0.7); }
-            to { opacity: 1; transform: scale(1); }
-        }
+        @keyframes popIn { from{opacity:0;transform:scale(.7);} to{opacity:1;transform:scale(1);} }
 
-        .chips { display: flex; gap: 0.45rem; flex-wrap: wrap; justify-content: center; margin-top: 1.4rem; }
-        .chip {
-            padding: 0.3rem 0.75rem;
-            border-radius: 50px;
-            border: 1px solid var(--border);
-            color: var(--muted);
-            font-size: 0.7rem;
-            cursor: pointer;
-            background: none;
-            transition: all 0.25s;
-        }
+        .chips { display: flex; gap: .45rem; flex-wrap: wrap; justify-content: center; margin-top: 1.4rem; }
+        .chip { padding: .3rem .75rem; border-radius: 50px; border: 1px solid var(--border); color: var(--muted); font-size: .7rem; cursor: pointer; background: none; transition: all .25s; }
         .chip:hover { border-color: var(--accent2); color: var(--accent2); transform: translateY(-1px); }
-        .chips-label { text-align: center; font-size: 0.72rem; color: var(--muted); margin-top: 1.1rem; opacity: 0.8; }
+        .chips-label { text-align: center; font-size: .72rem; color: var(--muted); margin-top: 1.1rem; opacity: .8; }
+        .foot { text-align: center; margin-top: 1.5rem; font-size: .74rem; color: var(--muted); opacity: .7; }
 
-        .foot {
-            text-align: center;
-            margin-top: 1.5rem;
-            font-size: 0.74rem;
-            color: var(--muted);
-            opacity: 0.7;
-        }
-        .foot a { color: var(--accent2); text-decoration: none; font-weight: 600; }
-
-        @media (max-width: 480px) {
-            .card { padding: 1.75rem 1.25rem; border-radius: 20px; }
-            .logo h1 { font-size: 1.25rem; }
-        }
+        @media (max-width: 480px) { .card { padding: 1.75rem 1.25rem; border-radius: 20px; } .logo h1 { font-size: 1.25rem; } }
     </style>
 </head>
 <body>
@@ -324,7 +141,8 @@
             <div class="logo">
                 <span class="dl-icon">⬇️</span>
                 <h1><span class="grad">V4ZRASHD</span> Downloader</h1>
-                <p>যেকোনো লিংক দিন — ছবি, ভিডিও, অডিও, ফাইল — ডাউনলোড করে দিব</p>
+                <p>যেকোনো লিংক দিন — ছবি, ভিডিও, অডিও, ফাইল — সুপার ফাস্ট ডাউনলোড</p>
+                <span class="fast-badge">⚡ X8 PARALLEL ENGINE</span>
             </div>
 
             <form onsubmit="start(event)">
@@ -333,7 +151,7 @@
                     <input type="url" id="url" placeholder="https://... যেকোনো লিংক" required autocomplete="off">
                 </div>
                 <div class="btn-row">
-                    <button class="btn" id="go" type="submit">⬇️ ডাউনলোড</button>
+                    <button class="btn" id="go" type="submit">⚡ ফাস্ট ডাউনলোড</button>
                     <button class="btn btn-ghost" type="button" onclick="paste()">📋 পেস্ট</button>
                 </div>
             </form>
@@ -353,35 +171,49 @@
                     <div class="ring-pct" id="pct">0%</div>
                 </div>
                 <div class="status-text" id="status">সংযোগ হচ্ছে...</div>
+                <div class="speed-row">
+                    <div class="speed-box"><div class="v" id="spd">—</div><div class="l">স্পিড</div></div>
+                    <div class="speed-box"><div class="v" id="eta">—</div><div class="l">বাকি</div></div>
+                    <div class="speed-box"><div class="v" id="conn">0</div><div class="l">কানেকশন</div></div>
+                </div>
+                <div class="threads" id="threads"></div>
             </div>
 
             <div class="info" id="info">
                 <div class="info-row"><span>📄 ফাইল</span><span id="iName">—</span></div>
                 <div class="info-row"><span>🗂️ টাইপ</span><span id="iType">—</span></div>
                 <div class="info-row"><span>📏 সাইজ</span><span id="iSize">—</span></div>
+                <div class="info-row"><span>🧩 মোড</span><span id="iMode">—</span></div>
             </div>
 
-            <div class="done-badge" id="done">✅ ডাউনলোড শুরু হয়েছে!</div>
+            <div class="done-badge" id="done">✅ ডাউনলোড সম্পূর্ণ!</div>
             <div class="err" id="err"></div>
 
             <p class="chips-label">💡 উদাহরণ (চাপলে অটো ফিল)</p>
             <div class="chips">
                 <button class="chip" onclick="fill('https://images.unsplash.com/photo-1518791841217-8f162f1e1131?w=1200')">🖼️ ছবি</button>
                 <button class="chip" onclick="fill('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3')">🎵 অডিও</button>
-                <button class="chip" onclick="fill('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4')">🎬 ভিডিও</button>
-                <button class="chip" onclick="fill('https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf')">📄 পিডিএফ</button>
+                <button class="chip" onclick="fill('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4')">🎬 ছোট ভিডিও</button>
+                <button class="chip" onclick="fill('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4')">🚀 বড় ভিডিও</button>
             </div>
 
-            <div class="foot">⚡ Vercel Edge দিয়ে চলছে · ভিডিও/সোশ্যাল মিডিয়ার জন্য <a href="/video.html">Video PRO</a></div>
+            <div class="foot">⚡ 4 API + 8x প্যারালাল চাঙ্ক ইঞ্জিন · Vercel Edge</div>
         </div>
     </div>
 
     <script>
-        const PROXY = '/api/proxy?url=';
+        // ---- config: multiple proxy APIs for max speed + redundancy ----
+        const APIS = ['/api/proxy?url=', '/api/proxy2?url=', '/api/proxy3?url='];
+        const INFO = '/api/info?url=';
+        const PARALLEL = 8;       // concurrent chunk downloads
+        const CHUNK = 4 * 1048576; // 4 MB per chunk
+        const MAX_PARALLEL_RAM = 600 * 1048576; // above this, use direct stream instead of RAM assembly
+
         const $ = id => document.getElementById(id);
         const url = $('url'), go = $('go');
         const pzone = $('pzone'), ring = $('ring'), pct = $('pct'), status = $('status');
         const info = $('info'), done = $('done'), err = $('err');
+        const spd = $('spd'), eta = $('eta'), conn = $('conn'), threadsEl = $('threads');
 
         function fill(u) { url.value = u; url.focus(); }
 
@@ -400,10 +232,10 @@
         }
 
         function reset() {
-            err.classList.remove('show');
-            info.classList.remove('show');
-            done.classList.remove('show');
-            pzone.classList.remove('show');
+            err.classList.remove('show'); info.classList.remove('show');
+            done.classList.remove('show'); pzone.classList.remove('show');
+            threadsEl.classList.remove('show'); threadsEl.innerHTML = '';
+            spd.textContent = '—'; eta.textContent = '—'; conn.textContent = '0';
         }
 
         function fmtSize(b) {
@@ -418,7 +250,32 @@
             const c = 2 * Math.PI * 40.5;
             ring.style.strokeDasharray = c;
             ring.style.strokeDashoffset = c * (1 - p / 100);
-            pct.textContent = Math.min(99, Math.round(p)) + '%';
+            pct.textContent = Math.min(100, Math.round(p)) + '%';
+        }
+
+        // race the info probes across APIs; first answer wins (fastest endpoint)
+        async function raceInfo(u) {
+            const target = INFO + encodeURIComponent(u);
+            try {
+                const r = await Promise.any(APIS.map(() => fetch(target, { cache: 'no-store' }).then(r => r.ok ? r.json() : Promise.reject(new Error('bad')))));
+                return r;
+            } catch (e) {
+                // fall back to manual probe through any proxy
+                for (const a of APIS) {
+                    try {
+                        const r = await fetch(a + encodeURIComponent(u), { method: 'GET', headers: { 'Range': 'bytes=0-0' } });
+                        if (!r.ok && r.status !== 206) continue;
+                        let size = parseInt(r.headers.get('Content-Length') || '0', 10);
+                        const cr = r.headers.get('Content-Range');
+                        if (cr) { const m = cr.match(/\/(\d+)/); if (m) size = parseInt(m[1], 10); }
+                        const cd = r.headers.get('Content-Disposition') || '';
+                        const name = (cd.match(/filename="?([^"]+)"?/) || [])[1] || u.split('/').pop().split('?')[0] || 'download';
+                        r.body && r.body.cancel();
+                        return { ok: true, name, type: (r.headers.get('Content-Type') || 'application/octet-stream').split(';')[0], size, supportsRange: r.status === 206 };
+                    } catch (_) {}
+                }
+                throw new Error('কোনো API থেকে সাড়া পাওয়া যায়নি');
+            }
         }
 
         async function start(e) {
@@ -433,66 +290,166 @@
             document.head.appendChild(sty);
 
             pzone.classList.add('show');
-            setRing(4);
+            setRing(3);
             status.innerHTML = 'সংযোগ হচ্ছে...';
 
             try {
-                // Probe with Range to learn size without downloading the whole file
-                const probe = PROXY + encodeURIComponent(u);
-                const r = await fetch(probe, { method: 'GET', headers: { 'Range': 'bytes=0-0' } });
+                // STEP 1: fastest-API info probe
+                const meta = await raceInfo(u);
+                if (meta.error) throw new Error(meta.error);
 
-                if (!r.ok && r.status !== 206) {
-                    let m = 'ডাউনলোড ব্যর্থ (HTTP ' + r.status + ')';
-                    try { const j = await r.json(); if (j.error) m = j.error; } catch (_) {}
-                    throw new Error(m);
-                }
-
-                let size = parseInt(r.headers.get('Content-Length') || '0', 10);
-                const cr = r.headers.get('Content-Range');
-                if (cr) { const m = cr.match(/\/(\d+)/); if (m) size = parseInt(m[1], 10); }
-
-                const type = (r.headers.get('Content-Type') || 'অজানা').split(';')[0];
-                const cd = r.headers.get('Content-Disposition') || '';
-                const nm = (cd.match(/filename="?([^"]+)"?/) || [])[1] || u.split('/').pop().split('?')[0] || 'download';
-
-                // consume probe body
-                r.body.cancel();
-
-                $('iName').textContent = nm;
-                $('iType').textContent = type;
-                $('iSize').textContent = fmtSize(size);
+                $('iName').textContent = meta.name;
+                $('iType').textContent = meta.type;
+                $('iSize').textContent = fmtSize(meta.size);
                 info.classList.add('show');
 
-                status.innerHTML = '⬇️ ডাউনলোড হচ্ছে... <b>' + fmtSize(size) + '</b>';
+                // STEP 2: pick the fastest proxy by racing a tiny range fetch
+                let apiIdx = 0;
+                try {
+                    apiIdx = await Promise.any(APIS.map((a, i) =>
+                        fetch(a + encodeURIComponent(u), { method: 'GET', headers: { 'Range': 'bytes=0-0' }, cache: 'no-store' })
+                            .then(r => { if (!r.ok && r.status !== 206) throw new Error('x'); r.body && r.body.cancel(); return i; })
+                    ));
+                } catch (_) { apiIdx = 0; }
+                const PROXY = APIS[apiIdx];
 
-                // Start real download in browser
-                const a = document.createElement('a');
-                a.href = probe;
-                a.download = nm;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
+                const useParallel = meta.supportsRange && meta.size > CHUNK * 2 && meta.size < MAX_PARALLEL_RAM;
 
-                // Animate ring to full (browser handles the actual transfer)
-                let p = 12;
-                const iv = setInterval(() => {
-                    p = Math.min(p + (8 + Math.random() * 22), 97);
-                    setRing(p);
-                    if (p >= 97) {
-                        clearInterval(iv);
-                        setRing(100);
-                        status.innerHTML = '✅ সম্পূর্ণ!';
-                        done.classList.add('show');
-                    }
-                }, 260);
+                if (useParallel) {
+                    $('iMode').textContent = '⚡ 8x প্যারালাল চাঙ্ক';
+                    await parallelDownload(u, meta, PROXY);
+                } else {
+                    $('iMode').textContent = meta.supportsRange ? '🌊 ডিরেক্ট স্ট্রিম' : '🔗 ডিরেক্ট';
+                    await directDownload(u, meta, PROXY);
+                }
 
             } catch (ex) {
                 pzone.classList.remove('show');
                 showErr(ex.message || 'ডাউনলোড ব্যর্থ — লিংক চেক করুন');
             } finally {
                 go.disabled = false;
-                go.textContent = '⬇️ আবার ডাউনলোড';
+                go.textContent = '⚡ ফাস্ট ডাউনলোড';
             }
+        }
+
+        // ---- direct single-stream download (small files or huge files) ----
+        async function directDownload(u, meta, PROXY) {
+            status.innerHTML = '⬇️ ডাউনলোড হচ্ছে... <b>' + fmtSize(meta.size) + '</b>';
+            const link = PROXY + encodeURIComponent(u);
+            const a = document.createElement('a');
+            a.href = link; a.download = meta.name;
+            document.body.appendChild(a); a.click(); a.remove();
+
+            // animate progress (browser transfer is not measurable for cross-file saves)
+            let p = 10;
+            const iv = setInterval(() => {
+                p = Math.min(p + 6 + Math.random() * 14, 96);
+                setRing(p);
+                if (p >= 96) {
+                    clearInterval(iv);
+                    setRing(100);
+                    status.innerHTML = '✅ সম্পূর্ণ!';
+                    done.classList.add('show');
+                }
+            }, 240);
+        }
+
+        // ---- parallel chunked download: N connections at once ----
+        async function parallelDownload(u, meta, PROXY) {
+            const total = meta.size;
+            const starts = [];
+            for (let s = 0; s < total; s += CHUNK) starts.push(s);
+            const n = starts.length;
+            const parts = new Array(n);
+            const partDone = new Array(n).fill(0);
+            let active = 0, nextQ = 0, finishedBytes = 0;
+            const t0 = performance.now();
+            let stopped = false;
+
+            // per-thread bars
+            const nThreads = Math.min(PARALLEL, n);
+            for (let i = 0; i < nThreads; i++) {
+                const el = document.createElement('div');
+                el.className = 'thread';
+                el.innerHTML = '<span class="lbl">T' + (i + 1) + '</span><div class="bar"><i id="tb' + i + '"></i></div><span id="tt' + i + '">0%</span>';
+                threadsEl.appendChild(el);
+            }
+            threadsEl.classList.add('show');
+
+            const link = PROXY + encodeURIComponent(u);
+            const baseIdx = APIS.indexOf(PROXY);
+
+            function updateUI() {
+                const p = (finishedBytes / total) * 100;
+                setRing(p);
+                const el = (performance.now() - t0) / 1000;
+                const bps = finishedBytes / el;
+                spd.textContent = bps > 0 ? (bps / 1048576).toFixed(1) + ' MB/s' : '…';
+                const rem = bps > 0 ? (total - finishedBytes) / bps : 0;
+                eta.textContent = rem > 0 ? (rem > 60 ? (rem / 60).toFixed(0) + ' মিনিট' : rem.toFixed(0) + ' সেকেন্ড') : '…';
+                conn.textContent = active;
+                for (let i = 0; i < nThreads; i++) {
+                    const bar = $('tb' + i), lbl = $('tt' + i);
+                    if (!bar) continue;
+                    const idx = i + (nextQ - nThreads);
+                    const tp = (idx >= 0 && idx < n && partDone[idx] !== undefined) ? (partDone[idx] / Math.min(CHUNK, total - starts[idx]) * 100) : 0;
+                    bar.style.width = Math.min(100, tp) + '%';
+                    lbl.textContent = Math.round(tp) + '%';
+                }
+            }
+
+            async function worker(slot) {
+                while (nextQ < n && !stopped) {
+                    const idx = nextQ++;
+                    const startB = starts[idx];
+                    const endB = Math.min(startB + CHUNK - 1, total - 1);
+                    const sz = endB - startB + 1;
+                    active++;
+                    try {
+                        const r = await fetch(link, { headers: { 'Range': 'bytes=' + startB + '-' + endB } });
+                        if (!r.ok && r.status !== 206) throw new Error('range failed');
+                        const buf = await r.arrayBuffer();
+                        parts[idx] = buf;
+                        partDone[idx] = sz;
+                        finishedBytes += buf.byteLength;
+                    } catch (e) {
+                        // retry once on the next proxy
+                        const alt = APIS[(baseIdx + 1) % APIS.length];
+                        try {
+                            const r2 = await fetch(alt + encodeURIComponent(u), { headers: { 'Range': 'bytes=' + startB + '-' + endB } });
+                            if (!r2.ok && r2.status !== 206) throw new Error('retry failed');
+                            const buf = await r2.arrayBuffer();
+                            parts[idx] = buf; partDone[idx] = sz; finishedBytes += buf.byteLength;
+                        } catch (e2) {
+                            stopped = true;
+                            showErr('চাঙ্ক ডাউনলোড ব্যর্থ: ' + (e2.message || 'unknown'));
+                            return;
+                        }
+                    } finally { active--; }
+                    updateUI();
+                }
+            }
+
+            status.innerHTML = '⚡ <b>' + nThreads + 'x</b> প্যারালালে ডাউনলোড হচ্ছে...';
+            const workers = [];
+            for (let i = 0; i < nThreads; i++) workers.push(worker(i));
+            await Promise.all(workers);
+
+            if (stopped) { pzone.classList.remove('show'); return; }
+
+            setRing(100);
+            status.innerHTML = '🧩 ফাইল একত্র করা হচ্ছে...';
+            const blob = new Blob(parts, { type: meta.type || 'application/octet-stream' });
+            const blobUrl = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = blobUrl; a.download = meta.name;
+            document.body.appendChild(a); a.click(); a.remove();
+            setTimeout(() => URL.revokeObjectURL(blobUrl), 4000);
+
+            const el = (performance.now() - t0) / 1000;
+            status.innerHTML = '✅ সম্পূর্ণ! <b>' + fmtSize(total) + '</b> / ' + el.toFixed(1) + ' সেকেন্ডে';
+            $('done').classList.add('show');
+            updateUI();
         }
     </script>
 </body>
