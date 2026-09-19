@@ -8,14 +8,14 @@
     <style>
         :root { --bg:#0a0a0f; --card:#1a1a24; --accent:#6c5ce7; --accent2:#00cec9; --accent3:#fd79a8; --text:#e9e9f0; --muted:#8b8ba3; --border:#2a2a38; }
         * { margin:0; padding:0; box-sizing:border-box; }
-        body { background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui,sans-serif; min-height:100vh; display:flex; align-items:flex-start; justify-content:center; padding:5rem 1.5rem 2rem; }
-        .container { max-width:580px; width:100%; }
+        body { background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui,sans-serif; min-height:100vh; display:flex; align-items:flex-start; justify-content:center; padding:4rem 1.5rem 2rem; }
+        .container { max-width:620px; width:100%; }
         .card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:2rem; }
         h1 { font-size:1.5rem; margin-bottom:0.25rem; text-align:center; }
         h1 span { background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
         .sub { color:var(--muted); font-size:0.85rem; margin-bottom:1.25rem; text-align:center; }
-        input[type=url] { width:100%; background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:0.85rem 1rem; color:var(--text); font-size:0.95rem; margin-bottom:0.75rem; outline:none; transition:border-color 0.3s; }
-        input[type=url]:focus { border-color:var(--accent); }
+        input[type=url], input[type=text] { width:100%; background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:0.85rem 1rem; color:var(--text); font-size:0.95rem; margin-bottom:0.75rem; outline:none; transition:border-color 0.3s; }
+        input:focus { border-color:var(--accent); }
         .row { display:flex; gap:0.75rem; }
         .btn { padding:0.85rem 1.5rem; border:none; border-radius:10px; font-weight:600; font-size:0.95rem; cursor:pointer; transition:all 0.3s; }
         .btn-gen { flex:1; background:linear-gradient(135deg,var(--accent),var(--accent2)); color:white; }
@@ -23,11 +23,13 @@
         .btn-gen:disabled { opacity:0.5; cursor:wait; transform:none; }
         .btn-audio { background:transparent; border:1px solid var(--border); color:var(--muted); }
         .btn-audio:hover { border-color:var(--accent3); color:var(--accent3); }
+        .btn-audio.on { border-color:var(--accent3); color:var(--accent3); background:rgba(253,121,168,0.08); }
         .platforms { display:flex; gap:0.5rem; flex-wrap:wrap; margin:0.75rem 0 1.25rem; justify-content:center; }
         .platform { padding:0.35rem 0.75rem; border-radius:50px; border:1px solid var(--border); color:var(--muted); font-size:0.72rem; }
+        .platform.ok { border-color:rgba(0,206,201,0.4); color:var(--accent2); }
         .result { background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:1rem; margin-top:1rem; display:none; }
         .result.show { display:block; }
-        .result-thumb { width:100%; border-radius:10px; margin-bottom:0.75rem; max-height:200px; object-fit:cover; }
+        .result-thumb { width:100%; border-radius:10px; margin-bottom:0.75rem; max-height:220px; object-fit:cover; }
         .result-title { font-size:0.95rem; margin-bottom:0.5rem; line-height:1.4; }
         .result-meta { font-size:0.75rem; color:var(--muted); margin-bottom:0.75rem; }
         .dl-link { display:flex; align-items:center; gap:0.75rem; background:var(--card); border:1px solid var(--border); border-radius:10px; padding:0.75rem 1rem; margin-bottom:0.5rem; text-decoration:none; color:var(--text); transition:all 0.3s; }
@@ -44,6 +46,7 @@
         .telegram-note a { color:#229ED9; text-decoration:none; font-weight:600; }
         .back { text-align:center; margin-top:1.5rem; }
         .back a { color:var(--accent2); text-decoration:none; font-size:0.85rem; }
+        .mode-note { font-size:0.72rem; color:var(--muted); text-align:center; margin-bottom:0.5rem; }
     </style>
 </head>
 <body>
@@ -52,18 +55,19 @@
             <h1>🎬 <span>Video Downloader</span></h1>
             <p class="sub">যেকোনো ভিডিও ডাউনলোড করুন — ফ্রি, দ্রুত, ওয়াটারমার্ক ছাড়া</p>
             <div class="platforms">
-                <span class="platform">▶️ YouTube</span>
-                <span class="platform">📸 Instagram</span>
-                <span class="platform">🎵 TikTok</span>
-                <span class="platform">🐦 Twitter/X</span>
-                <span class="platform">🎙️ Reddit</span>
-                <span class="platform">📘 Facebook</span>
+                <span class="platform ok">▶️ YouTube</span>
+                <span class="platform ok">🎵 TikTok</span>
+                <span class="platform ok">📸 Instagram</span>
+                <span class="platform ok">🐦 Twitter/X</span>
+                <span class="platform ok">📘 Facebook</span>
+                <span class="platform ok">🎙️ Reddit</span>
             </div>
-            <form onsubmit="download(event, 'video')">
+            <p class="mode-note" id="modeNote">📹 ভিডিও মোড — MP4 ডাউনলোড হবে</p>
+            <form onsubmit="download(event)">
                 <input type="url" id="url" placeholder="https://youtube.com/watch?v=... লিংক দিন" required>
                 <div class="row">
-                    <button class="btn btn-gen" id="btn" type="submit">🎬 ভিডিও ডাউনলোড</button>
-                    <button class="btn btn-audio" type="button" onclick="download(event,'audio')">🎵 MP3</button>
+                    <button class="btn btn-gen" id="btn" type="submit">⬇️ ডাউনলোড করুন</button>
+                    <button class="btn btn-audio" type="button" id="audioBtn" onclick="toggleMode()">🎵 MP3 মোড</button>
                 </div>
             </form>
             <div class="err" id="err"></div>
@@ -74,7 +78,7 @@
                 <div id="links"></div>
             </div>
             <div class="telegram-note">
-                💡 বড় ভিডিও (৪৫MB+) বা এই পেজে না পেলে আমার টেলিগ্রাম বট ব্যবহার করুন — <a href="https://t.me/v4zvideodownloadbot" target="_blank">@v4zvideodownloadbot</a>
+                💡 বড় ভিডিও বা এই পেজে না পেলে আমার টেলিগ্রাম বট ব্যবহার করুন — <a href="https://t.me/v4zvideodownloadbot" target="_blank">@v4zvideodownloadbot</a>
             </div>
         </div>
         <div class="back"><a href="/">← হোমে ফিরুন</a></div>
@@ -84,6 +88,20 @@
         let mode = 'video';
         const PIPED = 'https://api.piped.private.coffee';
         const TIKWM = 'https://www.tikwm.com/api/';
+        const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36';
+
+        function toggleMode() {
+            mode = mode === 'video' ? 'audio' : 'video';
+            const b = document.getElementById('audioBtn');
+            const n = document.getElementById('modeNote');
+            if (mode === 'audio') {
+                b.classList.add('on');
+                n.textContent = '🎵 অডিও মোড — MP3 / M4A ডাউনলোড হবে';
+            } else {
+                b.classList.remove('on');
+                n.textContent = '📹 ভিডিও মোড — MP4 ডাউনলোড হবে';
+            }
+        }
 
         function detectPlatform(url) {
             const u = url.toLowerCase();
@@ -97,19 +115,12 @@
         }
 
         function extractYouTubeId(url) {
-            const patterns = [
-                /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/
-            ];
-            for (const p of patterns) {
-                const m = url.match(p);
-                if (m) return m[1];
-            }
-            return null;
+            const m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/);
+            return m ? m[1] : null;
         }
 
-        async function download(e, m) {
+        async function download(e) {
             e.preventDefault();
-            mode = m;
             const url = document.getElementById('url').value.trim();
             const btn = document.getElementById('btn');
             const err = document.getElementById('err');
@@ -117,18 +128,19 @@
             err.style.display = 'none';
             res.classList.remove('show');
             btn.disabled = true;
-            btn.innerHTML = '<span class="spinner"></span>ডাউনলোড খোঁজা হচ্ছে...';
+            btn.innerHTML = '<span class="spinner"></span>প্রসেস হচ্ছে...';
             try {
                 const platform = detectPlatform(url);
                 if (platform === 'youtube') await doYouTube(url);
-                else if (platform === 'tiktok') await doTikTok(url);
-                else throw new Error('এই প্ল্যাটফর্মটি এখনো সাপোর্ট করে না। YouTube বা TikTok লিংক দিন।');
+                else if (platform === 'tiktok' || platform === 'instagram' || platform === 'facebook') await doTikWM(url, platform);
+                else if (platform === 'twitter' || platform === 'reddit') await doTikWM(url, platform);
+                else throw new Error('এই প্ল্যাটফর্মটি সাপোর্ট করে না। YouTube, TikTok, Instagram, Facebook, Twitter বা Reddit লিংক দিন।');
             } catch (ex) {
                 err.textContent = '❌ ' + (ex.message || 'ডাউনলোড ব্যর্থ। লিংক সঠিক কিনা দেখুন।');
                 err.style.display = 'block';
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = '🎬 ভিডিও ডাউনলোড';
+                btn.innerHTML = '⬇️ ডাউনলোড করুন';
             }
         }
 
@@ -164,55 +176,73 @@
             return m + ':' + String(s).padStart(2, '0');
         }
 
+        // ============ YOUTUBE (Piped) ============
         async function doYouTube(url) {
             const vid = extractYouTubeId(url);
             if (!vid) throw new Error('সঠিক YouTube লিংক দিন');
             const r = await fetch(PIPED + '/streams/' + vid, { headers: { 'Accept': 'application/json' } });
-            if (!r.ok) throw new Error('ভিডিও তথ্য পাওয়া যায়নি');
+            if (!r.ok) throw new Error('ভিডিও তথ্য পাওয়া যায়নি (Piped সার্ভার ব্যস্ত)');
             const d = await r.json();
             if (d.error) throw new Error(d.error);
             const title = d.title || 'YouTube Video';
             showResult(d.thumbnailUrl, title, '⏱ ' + fmtDuration(d.duration) + ' | ▶️ YouTube');
+
             if (mode === 'audio') {
-                const audios = (d.audioStreams || []).filter(function(a){ return a.mimeType && a.mimeType.includes('mp4'); });
-                if (audios.length) {
-                    const a = audios[0];
-                    addLink(a.url, '🎵', 'MP3 অডিও', a.quality || '', title + '.mp3');
-                    return;
-                }
-                // fallback: use LBRY video if no audio
-                const lbry = (d.videoStreams || []).find(function(v){ return v.quality === 'LBRY' && v.mimeType.includes('mp4'); });
-                if (lbry) addLink(lbry.url, '🎬', 'ভিডিও (অডিও নেই)', 'LBRY', title + '.mp4');
+                const audios = (d.audioStreams || []);
+                const m4a = audios.find(function(a){ return a.mimeType && a.mimeType.includes('mp4'); });
+                if (m4a) { addLink(m4a.url, '🎵', 'MP3 অডিও ' + (m4a.quality || ''), fmtSize(m4a.bitrate ? m4a.bitrate * d.duration / 8 : 0), title.slice(0,50) + '.mp3'); return; }
+                const any = audios[0];
+                if (any) { addLink(any.url, '🎵', 'অডিও ' + (any.quality || ''), '', title.slice(0,50) + '.mp3'); return; }
+                // fallback: LBRY mp4 (has audio)
+                const lbry = (d.videoStreams || []).find(function(v){ return v.quality === 'LBRY' && v.mimeType && v.mimeType.includes('mp4'); });
+                if (lbry) addLink(lbry.url, '🎬', 'ভিডিও (অডিও স্ট্রিম নেই)', 'LBRY', title.slice(0,50) + '.mp4');
+                else throw new Error('এই ভিডিওর কোনো অডিও স্ট্রিম নেই');
                 return;
             }
             // video mode
             const vids = (d.videoStreams || []).filter(function(v){ return v.mimeType && v.mimeType.includes('mp4') && v.url; });
             const seen = {};
+            let added = 0;
             vids.forEach(function(v) {
-                const q = v.quality;
+                const q = v.quality || '?';
                 if (seen[q]) return;
                 seen[q] = true;
+                added++;
                 const isLbry = q.includes('LBRY');
-                addLink(v.url, '🎬', isLbry ? 'সর্বোচ্চ কোয়ালিটি (LBRY)' : q + ' MP4', fmtSize(v.bitrate ? v.bitrate * d.duration / 8 : 0), title + '.mp4');
+                addLink(v.url, '🎬', isLbry ? 'সর্বোচ্চ কোয়ালিটি (LBRY)' : q + ' MP4', fmtSize(v.bitrate ? v.bitrate * d.duration / 8 : 0), title.slice(0,50) + '.mp4');
             });
-            if (!vids.length) throw new Error('কোনো ডাউনলোডযোগ্য স্ট্রিম পাওয়া যায়নি');
+            if (!added) {
+                const lbry = (d.videoStreams || []).find(function(v){ return v.url; });
+                if (lbry) addLink(lbry.url, '🎬', 'ভিডিও', lbry.quality || '', title.slice(0,50) + '.mp4');
+                else throw new Error('কোনো ডাউনলোডযোগ্য স্ট্রিম পাওয়া যায়নি');
+            }
         }
 
-        async function doTikTok(url) {
-            const r = await fetch(TIKWM + '?url=' + encodeURIComponent(url), { headers: { 'Accept': 'application/json' } });
-            if (!r.ok) throw new Error('TikTok ভিডিও তথ্য পাওয়া যায়নি');
+        // ============ TIKTOK / INSTAGRAM / FACEBOOK / TWITTER / REDDIT (tikwm) ============
+        async function doTikWM(url, platform) {
+            const r = await fetch(TIKWM + '?url=' + encodeURIComponent(url), {
+                headers: { 'Accept': 'application/json' }
+            });
+            if (!r.ok) throw new Error(platform + ' ভিডিও তথ্য পাওয়া যায়নি');
             const d = await r.json();
-            if (d.code !== 0 || !d.data) throw new Error(d.msg || 'TikTok ভিডিও পাওয়া যায়নি');
+            if (d.code !== 0 || !d.data) throw new Error(d.msg || platform + ' ভিডিও পাওয়া যায়নি। লিংকটি পাবলিক কিনা দেখুন।');
             const data = d.data;
-            const title = (data.title || 'TikTok Video').slice(0, 100);
-            showResult(data.cover, title, '⏱ ' + fmtDuration(data.duration) + ' | 🎵 TikTok');
+            const title = (data.title || data.desc || platform + ' Video').slice(0, 100);
+            const icon = { tiktok:'🎵', instagram:'📸', facebook:'📘', twitter:'🐦', reddit:'🎙️' }[platform] || '🎬';
+            showResult(data.cover, title, '⏱ ' + fmtDuration(data.duration) + ' | ' + icon + ' ' + platform);
+
             if (mode === 'audio') {
-                if (data.music) addLink(data.music, '🎵', 'MP3 অডিও', fmtSize(0), (data.music_info && data.music_info.title || 'audio') + '.mp3');
+                if (data.music) addLink(data.music, '🎵', 'MP3 অডিও', '', ((data.music_info && data.music_info.title) || 'audio').slice(0,40) + '.mp3');
+                else throw new Error('এই ভিডিওর কোনো মিউজিক স্ট্রিম নেই');
                 return;
             }
-            if (data.play) addLink(data.play, '🎬', 'ওয়াটারমার্ক ছাড়া', fmtSize(data.size), title.slice(0, 40) + '.mp4');
-            if (data.wmplay) addLink(data.wmplay, '🎬', 'ওয়াটারমার্ক সহ', fmtSize(data.wm_size), title.slice(0, 40) + '_wm.mp4');
-            if (data.hdplay) addLink(data.hdplay, '✨', 'HD কোয়ালিটি', '', title.slice(0, 40) + '_hd.mp4');
+            // video mode — prefer HD, then no-watermark, then watermark
+            if (data.hdplay) addLink(data.hdplay, '✨', 'HD কোয়ালিটি', fmtSize(data.hd_size), title.slice(0,40) + '_hd.mp4');
+            if (data.play) addLink(data.play, '🎬', 'ওয়াটারমার্ক ছাড়া', fmtSize(data.size), title.slice(0,40) + '.mp4');
+            if (data.wmplay) addLink(data.wmplay, '🎬', 'ওয়াটারমার্ক সহ', fmtSize(data.wm_size), title.slice(0,40) + '_wm.mp4');
+            // Instagram/Twitter may give 'url' field
+            if (data.url) addLink(data.url, '🎬', 'ভিডিও', '', title.slice(0,40) + '.mp4');
+            if (!data.hdplay && !data.play && !data.wmplay && !data.url) throw new Error('কোনো ডাউনলোডযোগ্য স্ট্রিম পাওয়া যায়নি');
         }
     </script>
 </body>
