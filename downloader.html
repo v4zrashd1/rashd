@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal Downloader — V4ZRASHD</title>
+    <script defer src="/_vercel/insights/script.js"></script>
+    <style>
+        :root { --bg:#0a0a0f; --card:#1a1a24; --accent:#6c5ce7; --accent2:#00cec9; --accent3:#fd79a8; --text:#e9e9f0; --muted:#8b8ba3; --border:#2a2a38; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui,sans-serif; min-height:100vh; padding:4rem 1.5rem 2rem; }
+        .container { max-width:680px; margin:0 auto; }
+        .card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:2rem; }
+        h1 { font-size:1.5rem; text-align:center; margin-bottom:0.25rem; }
+        h1 span { background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .sub { color:var(--muted); font-size:0.85rem; text-align:center; margin-bottom:1.25rem; }
+        .pro-badge { display:inline-block; padding:0.2rem 0.8rem; border-radius:50px; background:linear-gradient(135deg,var(--accent3),var(--accent)); color:white; font-size:0.68rem; font-weight:700; margin-left:0.4rem; vertical-align:middle; }
+        input[type=url] { width:100%; background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:0.85rem 1rem; color:var(--text); font-size:0.95rem; margin-bottom:0.75rem; outline:none; transition:border-color 0.3s; }
+        input:focus { border-color:var(--accent); }
+        .btn { width:100%; padding:0.9rem; border:none; border-radius:10px; font-weight:600; font-size:0.95rem; cursor:pointer; background:linear-gradient(135deg,var(--accent),var(--accent2)); color:white; transition:all 0.3s; margin-bottom:0.5rem; }
+        .btn:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(108,92,231,0.4); }
+        .btn:disabled { opacity:0.5; cursor:wait; transform:none; }
+        .btn-alt { background:transparent; border:1px solid var(--border); color:var(--muted); }
+        .btn-alt:hover { border-color:var(--accent3); color:var(--accent3); box-shadow:none; }
+        .err { color:#e74c3c; font-size:0.85rem; margin-top:0.75rem; display:none; text-align:center; }
+        .info-box { background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:1rem; margin-top:1rem; display:none; }
+        .info-box.show { display:block; }
+        .info-box h3 { font-size:0.9rem; margin-bottom:0.5rem; color:var(--accent2); }
+        .info-row { display:flex; justify-content:space-between; font-size:0.82rem; padding:0.3rem 0; border-bottom:1px solid var(--border); }
+        .info-row:last-child { border-bottom:none; }
+        .info-row span:first-child { color:var(--muted); }
+        .spinner { display:inline-block; width:14px; height:14px; border:2px solid rgba(255,255,255,0.3); border-top-color:white; border-radius:50%; animation:spin 0.8s linear infinite; vertical-align:middle; margin-right:0.4rem; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+        .progress { width:100%; height:6px; background:var(--bg); border-radius:3px; margin-top:0.75rem; overflow:hidden; display:none; }
+        .progress.show { display:block; }
+        .progress-bar { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:3px; width:0%; transition:width 0.3s; }
+        .examples { margin-top:1.25rem; }
+        .examples h4 { font-size:0.78rem; color:var(--muted); margin-bottom:0.5rem; text-align:center; }
+        .ex-tags { display:flex; gap:0.4rem; flex-wrap:wrap; justify-content:center; }
+        .ex-tag { padding:0.25rem 0.65rem; border-radius:50px; border:1px solid var(--border); color:var(--muted); font-size:0.68rem; cursor:pointer; transition:all 0.2s; background:none; }
+        .ex-tag:hover { border-color:var(--accent2); color:var(--accent2); }
+        .telegram-note { margin-top:1.25rem; padding:0.85rem 1rem; background:rgba(34,158,217,0.08); border:1px solid rgba(34,158,217,0.3); border-radius:10px; font-size:0.8rem; color:var(--muted); text-align:center; }
+        .telegram-note a { color:#229ED9; text-decoration:none; font-weight:600; }
+        .back { text-align:center; margin-top:1.5rem; }
+        .back a { color:var(--accent2); text-decoration:none; font-size:0.85rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>⬇️ <span>Universal Downloader</span><span class="pro-badge">ANY LINK</span></h1>
+            <p class="sub">যেকোনো লিংক দিন — ছবি, ভিডিও, অডিও, পিডিএফ, জিপ, যা-ই হোক — ডাউনলোড করে দিব</p>
+
+            <form onsubmit="startDownload(event)">
+                <input type="url" id="url" placeholder="https://example.com/file.zip — যেকোনো লিংক" required>
+                <button class="btn" id="dlBtn" type="submit">⬇️ ডাউনলোড করুন</button>
+                <button class="btn btn-alt" type="button" id="copyBtn" onclick="pasteClipboard()">📋 পেস্ট করুন</button>
+            </form>
+
+            <div class="err" id="err"></div>
+            <div class="progress" id="progress"><div class="progress-bar" id="progressBar"></div></div>
+
+            <div class="info-box" id="info">
+                <h3>📋 ফাইল তথ্য</h3>
+                <div class="info-row"><span>টাইপ</span><span id="infoType">—</span></div>
+                <div class="info-row"><span>সাইজ</span><span id="infoSize">—</span></div>
+                <div class="info-row"><span>নাম</span><span id="infoName">—</span></div>
+                <div class="info-row"><span>স্ট্যাটাস</span><span id="infoStatus">—</span></div>
+            </div>
+
+            <div class="examples">
+                <h4>💡 কী কী ডাউনলোড করতে পারবেন</h4>
+                <div class="ex-tags">
+                    <button class="ex-tag" onclick="fillExample('image')">🖼️ ছবি</button>
+                    <button class="ex-tag" onclick="fillExample('video')">🎬 ভিডিও</button>
+                    <button class="ex-tag" onclick="fillExample('audio')">🎵 অডিও</button>
+                    <button class="ex-tag" onclick="fillExample('pdf')">📄 পিডিএফ</button>
+                    <button class="ex-tag" onclick="fillExample('zip')">🗜️ জিপ ফাইল</button>
+                    <button class="ex-tag" onclick="fillExample('doc')">📝 ডকুমেন্ট</button>
+                </div>
+            </div>
+
+            <div class="telegram-note">
+                💡 ভিডিও ডাউনলোডের জন্য <a href="/video.html">Video Downloader PRO</a> ব্যবহার করুন — এটা সরাসরি ফাইলের জন্য
+            </div>
+        </div>
+        <div class="back"><a href="/">← হোমে ফিরুন</a></div>
+    </div>
+
+    <script>
+        const PROXY = '/api/proxy?url=';
+        const urlInput = document.getElementById('url');
+        const dlBtn = document.getElementById('dlBtn');
+        const err = document.getElementById('err');
+        const info = document.getElementById('info');
+        const progress = document.getElementById('progress');
+        const progressBar = document.getElementById('progressBar');
+
+        const EXAMPLES = {
+            image: 'https://images.unsplash.com/photo-1518791841217-8f162f1e1131?w=1200',
+            video: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+            audio: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+            pdf: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+            zip: 'https://github.com/microsoft/vscode/archive/refs/heads/main.zip',
+            doc: 'https://file-examples.com/storage/fe68c7fd71634e0c98c9d2633/example.docx',
+        };
+
+        function fillExample(type) {
+            urlInput.value = EXAMPLES[type];
+            urlInput.focus();
+        }
+
+        async function pasteClipboard() {
+            try {
+                const text = await navigator.clipboard.readText();
+                if (text && /^https?:\/\//i.test(text.trim())) {
+                    urlInput.value = text.trim();
+                    urlInput.focus();
+                } else {
+                    showError('ক্লিপবোর্ডে কোনো লিংক নেই');
+                }
+            } catch (e) {
+                showError('ক্লিপবোর্ড অ্যাক্সেস করা যায়নি। নিজে লিংক পেস্ট করুন।');
+            }
+        }
+
+        function showError(msg) {
+            err.textContent = '❌ ' + msg;
+            err.style.display = 'block';
+            setTimeout(function() { err.style.display = 'none'; }, 5000);
+        }
+
+        function fmtSize(bytes) {
+            if (bytes === null || bytes === undefined) return 'অজানা';
+            const mb = bytes / 1048576;
+            if (mb < 1) return Math.round(bytes / 1024) + ' KB';
+            if (mb < 1024) return mb.toFixed(2) + ' MB';
+            return (mb / 1024).toFixed(2) + ' GB';
+        }
+
+        async function startDownload(e) {
+            e.preventDefault();
+            const url = urlInput.value.trim();
+            if (!url) return;
+
+            err.style.display = 'none';
+            info.classList.remove('show');
+            progress.classList.remove('show');
+            dlBtn.disabled = true;
+            dlBtn.innerHTML = '<span class="spinner"></span>চেক করা হচ্ছে...';
+
+            try {
+                // Step 1: HEAD request via proxy to get file info
+                const headUrl = PROXY + encodeURIComponent(url);
+                const r = await fetch(headUrl, { method: 'GET' });
+
+                if (!r.ok && r.status !== 206) {
+                    let msg = 'ডাউনলোড ব্যর্থ (HTTP ' + r.status + ')';
+                    try {
+                        const j = await r.json();
+                        if (j.error) msg = j.error;
+                    } catch (_) {}
+                    throw new Error(msg);
+                }
+
+                const size = parseInt(r.headers.get('Content-Length') || '0', 10);
+                const type = (r.headers.get('Content-Type') || 'অজানা').split(';')[0];
+                const cd = r.headers.get('Content-Disposition') || '';
+                const nameMatch = cd.match(/filename="?([^"]+)"?/);
+                const name = nameMatch ? nameMatch[1] : url.split('/').pop().split('?')[0] || 'download';
+
+                // Show info
+                document.getElementById('infoType').textContent = type;
+                document.getElementById('infoSize').textContent = fmtSize(size) || 'অজানা';
+                document.getElementById('infoName').textContent = name;
+                document.getElementById('infoStatus').textContent = '✅ প্রস্তুত';
+                info.classList.add('show');
+
+                // Step 2: trigger actual download
+                dlBtn.innerHTML = '<span class="spinner"></span>ডাউনলোড শুরু...';
+                progress.classList.add('show');
+
+                const a = document.createElement('a');
+                a.href = headUrl;
+                a.download = name;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+
+                // Animate progress bar (download runs in browser's own manager)
+                let p = 0;
+                const iv = setInterval(function() {
+                    p = Math.min(p + Math.random() * 18, 92);
+                    progressBar.style.width = p + '%';
+                    if (p >= 92) {
+                        clearInterval(iv);
+                        progressBar.style.width = '100%';
+                        document.getElementById('infoStatus').textContent = '⬇️ ডাউনলোড হচ্ছে...';
+                        setTimeout(function() {
+                            progressBar.style.width = '100%';
+                            document.getElementById('infoStatus').textContent = '✅ ডাউনলোড শুরু হয়েছে';
+                        }, 600);
+                    }
+                }, 250);
+
+            } catch (ex) {
+                showError(ex.message || 'ডাউনলোড ব্যর্থ। লিংক সঠিক কিনা দেখুন।');
+            } finally {
+                dlBtn.disabled = false;
+                dlBtn.innerHTML = '⬇️ আবার ডাউনলোড করুন';
+            }
+        }
+    </script>
+</body>
+</html>
