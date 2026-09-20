@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>V4ZRASHD Portfolio</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: #000; color: #fff; overflow-x: hidden; }
+        #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 50px 20px; position: relative; z-index: 2; }
+        header { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        h1 { font-size: 4rem; background: linear-gradient(90deg, #00f260, #0575e6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 20px; opacity: 0; transform: translateY(50px); }
+        p.subtitle { font-size: 1.5rem; color: #ccc; opacity: 0; transform: translateY(50px); }
+        section { min-height: 80vh; display: flex; flex-direction: column; justify-content: center; align-items: center; margin: 50px 0; opacity: 0; transform: translateY(100px); transition: all 1s ease; }
+        section.visible { opacity: 1; transform: translateY(0); }
+        h2 { font-size: 2.5rem; margin-bottom: 40px; border-bottom: 2px solid #0575e6; padding-bottom: 10px; }
+        .social-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; width: 100%; }
+        .card { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); padding: 30px; border-radius: 15px; text-align: center; text-decoration: none; color: #fff; border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s; }
+        .card:hover { transform: translateY(-10px); background: rgba(255,255,255,0.1); border-color: #0575e6; }
+        .card i { font-size: 2rem; margin-bottom: 15px; display: block; }
+        @media (max-width: 768px) { h1 { font-size: 2.5rem; } section { min-height: 60vh; } }
+    </style>
+</head>
+<body>
+    <canvas id="bg-canvas"></canvas>
+    <div class="container">
+        <header>
+            <h1>V4ZRASHD</h1>
+            <p class="subtitle">Digital Creator & Developer</p>
+        </header>
+        <section id="about">
+            <h2>About Me</h2>
+            <p style="font-size: 1.2rem; max-width: 600px; text-align: center;">আমি আছি একটি ডিজিটাল ক্রিয়েটর। আমি কোডিং, ডিজাইন আর কনটেন্ট ক্রিয়েশন পছন্দ করি।</p>
+        </section>
+        <section id="socials">
+            <h2>Connect With Me</h2>
+            <div class="social-grid">
+                <a href="https://www.tiktok.com/@v4zrashd" target="_blank" class="card"><i>🎵</i> TikTok</a>
+                <a href="https://github.com/v4zrashd" target="_blank" class="card"><i>💻</i> GitHub</a>
+                <a href="https://www.youtube.com/@V4Zteem" target="_blank" class="card"><i>🎥</i> YouTube</a>
+                <a href="https://t.me/v4zrasehd" target="_blank" class="card"><i>📢</i> Telegram</a>
+                <a href="#" class="card"><i>📘</i> Facebook</a>
+            </div>
+        </section>
+    </div>
+    <script>
+        const canvas = document.querySelector('#bg-canvas');
+        const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true });
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 2000;
+        const posArray = new Float32Array(particlesCount * 3);
+        for(let i = 0; i < particlesCount * 3; i++) posArray[i] = (Math.random() - 0.5) * 15;
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        const material = new THREE.PointsMaterial({ size: 0.02, color: 0x00f260, transparent: true, opacity: 0.8 });
+        const particlesMesh = new THREE.Points(particlesGeometry, material);
+        scene.add(particlesMesh);
+        camera.position.z = 3;
+        let mouseX = 0, mouseY = 0;
+        document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
+        const clock = new THREE.Clock();
+        function animate() {
+            const elapsedTime = clock.getElapsedTime();
+            particlesMesh.rotation.y += 0.002;
+            renderer.render(scene, camera);
+            window.requestAnimationFrame(animate);
+        }
+        animate();
+        window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
+        const sections = document.querySelectorAll('section');
+        const observer = new IntersectionObserver((entries) => { entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); }); }, { threshold: 0.1 });
+        sections.forEach(s => observer.observe(s));
+        gsap.to("h1", { opacity: 1, y: 0, duration: 1.5, ease: "power3.out" });
+        gsap.to(".subtitle", { opacity: 1, y: 0, duration: 1.5, delay: 0.5, ease: "power3.out" });
+    </script>
+</body>
+</html>
