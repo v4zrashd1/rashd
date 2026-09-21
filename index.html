@@ -3,550 +3,384 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>V4ZRASHD Downloader — Fast</title>
-    <meta name="description" content="যেকোনো লিংক দিন — সুপার ফাস্ট ডাউনলোড">
+    <title>অপেক্ষা করুন...</title>
+    
+    <!-- ============ 2 নম্বর: Monetag ============ -->
+    <meta name="monetag" content="b3a0bad47159adbdc1fef5b9a4cce7e2">
+    
+    <!-- ============ 1 নম্বর: Quge5 Ad Script ============ -->
+    <script src="https://quge5.com/88/tag.min.js" data-zone="262222" async data-cfasync="false"></script>
+    
     <style>
-        :root {
-            --bg: #08080f;
-            --card: rgba(22, 22, 36, 0.75);
-            --accent: #6c5ce7;
-            --accent2: #00cec9;
-            --accent3: #fd79a8;
-            --text: #e9e9f0;
-            --muted: #8b8ba3;
-            --border: rgba(108, 92, 231, 0.25);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
-            min-height: 100vh; color: var(--text);
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            display: flex; align-items: center; justify-content: center;
-            padding: 1.5rem; overflow: hidden; background: var(--bg);
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #fff;
         }
-        .aurora { position: fixed; inset: 0; z-index: 0; overflow: hidden; }
-        .aurora::before, .aurora::after {
-            content: ''; position: absolute; width: 70vmax; height: 70vmax;
-            border-radius: 50%; filter: blur(80px); opacity: 0.35;
-            animation: float 14s ease-in-out infinite;
+        
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px 30px;
+            max-width: 450px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.15);
         }
-        .aurora::before { background: radial-gradient(circle, var(--accent), transparent 60%); top: -25%; left: -15%; }
-        .aurora::after { background: radial-gradient(circle, var(--accent2), transparent 60%); bottom: -30%; right: -20%; animation-delay: -7s; }
-        .aurora .blob3 {
-            position: absolute; width: 50vmax; height: 50vmax; border-radius: 50%;
-            background: radial-gradient(circle, var(--accent3), transparent 60%);
-            filter: blur(70px); opacity: 0.22; top: 30%; left: 40%;
-            animation: float 18s ease-in-out infinite reverse;
+        
+        .icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
         }
-        @keyframes float { 0%,100%{transform:translate(0,0) scale(1);} 33%{transform:translate(8%,-6%) scale(1.1);} 66%{transform:translate(-6%,8%) scale(.95);} }
-
-        .container { position: relative; z-index: 1; width: 100%; max-width: 540px; }
-        .card {
-            background: var(--card); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-            border: 1px solid var(--border); border-radius: 24px; padding: 2.25rem 1.75rem;
-            box-shadow: 0 24px 80px rgba(0,0,0,0.5); animation: cardIn .7s cubic-bezier(.22,1,.36,1);
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
         }
-        @keyframes cardIn { from{opacity:0;transform:translateY(28px) scale(.96);} to{opacity:1;transform:none;} }
-        .logo { text-align: center; margin-bottom: 1.5rem; }
-        .logo .dl-icon { font-size: 2.6rem; display: inline-block; animation: bounceIcon 2.4s ease-in-out infinite; filter: drop-shadow(0 8px 20px rgba(108,92,231,.5)); }
-        @keyframes bounceIcon { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }
-        .logo h1 { font-size: 1.45rem; margin-top: .4rem; }
-        .logo h1 .grad {
-            background: linear-gradient(135deg, var(--accent), var(--accent2), var(--accent3));
-            background-size: 200% auto; -webkit-background-clip: text; background-clip: text;
-            -webkit-text-fill-color: transparent; animation: shimmer 3.5s linear infinite;
+        
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            font-weight: 700;
         }
-        @keyframes shimmer { to{background-position:200% center;} }
-        .logo p { color: var(--muted); font-size: .84rem; margin-top: .3rem; }
-        .fast-badge {
-            display: inline-block; margin-top: .55rem; padding: .25rem .8rem; border-radius: 50px;
-            background: linear-gradient(135deg, rgba(0,206,201,.18), rgba(108,92,231,.18));
-            border: 1px solid rgba(0,206,201,.4); color: var(--accent2);
-            font-size: .68rem; font-weight: 800; letter-spacing: .08em;
+        
+        .subtitle {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-bottom: 30px;
         }
-
-        form { margin-top: 1.25rem; }
-        .input-wrap { position: relative; }
-        input[type=url] {
-            width: 100%; background: rgba(8,8,15,.7); border: 1px solid var(--border);
-            border-radius: 14px; padding: .95rem 1rem .95rem 2.9rem; color: var(--text);
-            font-size: .92rem; outline: none; transition: all .35s;
+        
+        /* ============ টাইমার সার্কেল ============ */
+        .timer-container {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            margin: 0 auto 30px;
         }
-        input[type=url]:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(108,92,231,.14); }
-        .input-wrap .link-ico { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); font-size: .95rem; opacity: .5; }
-        .btn-row { display: flex; gap: .6rem; margin-top: .75rem; }
-        .btn {
-            flex: 1; padding: .95rem 1rem; border: none; border-radius: 14px;
-            font-weight: 700; font-size: .95rem; cursor: pointer; color: white;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            background-size: 150% auto; transition: all .35s; position: relative; overflow: hidden;
+        
+        .timer-svg {
+            transform: rotate(-90deg);
+            width: 180px;
+            height: 180px;
         }
-        .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(108,92,231,.45); background-position: right center; }
-        .btn:active:not(:disabled) { transform: translateY(0) scale(.98); }
-        .btn:disabled { opacity: .75; cursor: wait; }
-        .btn-ghost { flex: 0 0 auto; background: transparent; border: 1.5px solid var(--border); color: var(--muted); font-weight: 600; }
-        .btn-ghost:hover { border-color: var(--accent3); color: var(--accent3); box-shadow: none; }
-
-        .progress-zone { margin-top: 1.5rem; display: none; text-align: center; animation: cardIn .5s ease; }
-        .progress-zone.show { display: block; }
-        .ring-wrap { position: relative; width: 92px; height: 92px; margin: 0 auto; }
-        .ring-wrap svg { transform: rotate(-90deg); }
-        .ring-bg, .ring-fg { fill: none; stroke-width: 7; stroke-linecap: round; }
-        .ring-bg { stroke: rgba(255,255,255,.08); }
-        .ring-fg { stroke: url(#ringGrad); stroke-dasharray: 254.5; stroke-dashoffset: 254.5; transition: stroke-dashoffset .3s ease; filter: drop-shadow(0 0 8px rgba(0,206,201,.6)); }
-        .ring-pct { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; font-weight: 800; }
-        .status-text { margin-top: .85rem; font-size: .88rem; color: var(--muted); min-height: 1.3em; }
-        .status-text b { color: var(--accent2); }
-
-        .speed-row { display: flex; justify-content: center; gap: 1.1rem; margin-top: .8rem; }
-        .speed-box { text-align: center; }
-        .speed-box .v { font-size: 1.05rem; font-weight: 800; color: var(--accent2); }
-        .speed-box .l { font-size: .66rem; color: var(--muted); }
-
-        .threads { margin-top: .9rem; display: none; }
-        .threads.show { display: block; }
-        .thread { display: flex; align-items: center; gap: .5rem; font-size: .68rem; color: var(--muted); padding: .18rem 0; }
-        .thread .bar { flex: 1; height: 4px; background: rgba(255,255,255,.07); border-radius: 2px; overflow: hidden; }
-        .thread .bar i { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 2px; transition: width .3s; }
-        .thread .lbl { width: 3.6rem; }
-
-        .info { margin-top: 1.25rem; background: rgba(8,8,15,.6); border: 1px solid var(--border); border-radius: 14px; padding: .9rem 1rem; display: none; animation: cardIn .5s ease; }
-        .info.show { display: block; }
-        .info-row { display: flex; justify-content: space-between; align-items: center; font-size: .82rem; padding: .32rem 0; }
-        .info-row + .info-row { border-top: 1px solid rgba(255,255,255,.05); }
-        .info-row span:first-child { color: var(--muted); }
-        .info-row span:last-child { font-weight: 600; max-width: 60%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-        .err { margin-top: 1rem; padding: .8rem 1rem; background: rgba(231,76,60,.1); border: 1px solid rgba(231,76,60,.35); border-radius: 12px; color: #ff7a6b; font-size: .84rem; display: none; animation: shake .45s ease; }
-        .err.show { display: block; }
-        @keyframes shake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-7px);} 75%{transform:translateX(7px);} }
-
-        .done-badge { display: none; margin-top: 1.25rem; padding: .9rem; border-radius: 14px; background: linear-gradient(135deg, rgba(0,206,201,.14), rgba(108,92,231,.14)); border: 1px solid rgba(0,206,201,.4); text-align: center; font-weight: 700; color: var(--accent2); animation: popIn .6s cubic-bezier(.34,1.56,.64,1); }
-        .done-badge.show { display: block; }
-        @keyframes popIn { from{opacity:0;transform:scale(.7);} to{opacity:1;transform:scale(1);} }
-
-        .manual-link {
-            display: none; margin-top: 1rem; padding: 0.9rem; border-radius: 14px;
-            background: linear-gradient(135deg, rgba(108,92,231,.18), rgba(0,206,201,.18));
-            border: 1px solid rgba(108,92,231,.45); text-align: center;
-            color: #fff; font-weight: 700; font-size: .9rem; text-decoration: none;
-            animation: popIn .5s cubic-bezier(.34,1.56,.64,1);
+        
+        .timer-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.15);
+            stroke-width: 12;
         }
-        .manual-link.show { display: block; }
-        .manual-link:hover { box-shadow: 0 8px 26px rgba(108,92,231,.4); }
-
-        .chips { display: flex; gap: .45rem; flex-wrap: wrap; justify-content: center; margin-top: 1.4rem; }
-        .chip { padding: .3rem .75rem; border-radius: 50px; border: 1px solid var(--border); color: var(--muted); font-size: .7rem; cursor: pointer; background: none; transition: all .25s; }
-        .chip:hover { border-color: var(--accent2); color: var(--accent2); transform: translateY(-1px); }
-        .chips-label { text-align: center; font-size: .72rem; color: var(--muted); margin-top: 1.1rem; opacity: .8; }
-        .foot { text-align: center; margin-top: 1.5rem; font-size: .74rem; color: var(--muted); opacity: .7; }
-
-        @media (max-width: 480px) { .card { padding: 1.75rem 1.25rem; border-radius: 20px; } .logo h1 { font-size: 1.25rem; } }
+        
+        .timer-progress {
+            fill: none;
+            stroke: #00ff88;
+            stroke-width: 12;
+            stroke-linecap: round;
+            stroke-dasharray: 502;
+            stroke-dashoffset: 0;
+            transition: stroke-dashoffset 1s linear;
+            filter: drop-shadow(0 0 8px #00ff88);
+        }
+        
+        .timer-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            font-weight: 800;
+            color: #00ff88;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+        }
+        
+        .timer-label {
+            position: absolute;
+            top: 65%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* ============ কী বক্স ============ */
+        .key-box {
+            display: none;
+            animation: fadeIn 0.6s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .key-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+            animation: bounce 1s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .key-title {
+            color: #00ff88;
+            font-size: 20px;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        
+        .key-display {
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px dashed #00ff88;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: 4px;
+            color: #00ff88;
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+        
+        .copy-btn {
+            background: linear-gradient(135deg, #00ff88, #00cc6a);
+            color: #000;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 10px;
+            box-shadow: 0 8px 25px rgba(0, 255, 136, 0.3);
+        }
+        
+        .copy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(0, 255, 136, 0.5);
+        }
+        
+        .copy-btn:active {
+            transform: translateY(0);
+        }
+        
+        .copy-btn.copied {
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+            color: #fff;
+        }
+        
+        .note {
+            font-size: 12px;
+            opacity: 0.6;
+            margin-top: 20px;
+            line-height: 1.6;
+        }
+        
+        /* ============ লোডিং ============ */
+        .loading-dots {
+            display: inline-block;
+        }
+        
+        .loading-dots span {
+            animation: blink 1.4s infinite both;
+        }
+        
+        .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes blink {
+            0%, 80%, 100% { opacity: 0.3; }
+            40% { opacity: 1; }
+        }
     </style>
 </head>
 <body>
-    <div class="aurora"><div class="blob3"></div></div>
-
     <div class="container">
-        <div class="card">
-            <div class="logo">
-                <span class="dl-icon">⬇️</span>
-                <h1><span class="grad">V4ZRASHD</span> Downloader</h1>
-                <p>যেকোনো লিংক দিন — ছবি, ভিডিও, অডিও, ফাইল — সুপার ফাস্ট ডাউনলোড</p>
-                <span class="fast-badge">⚡ X8 PARALLEL ENGINE</span>
+        
+        <!-- ============ টাইমার সেকশন ============ -->
+        <div id="timerSection">
+            <div class="icon">⏳</div>
+            <h1>অনুগ্রহ করে অপেক্ষা করুন</h1>
+            <p class="subtitle">বিজ্ঞাপন লোড হচ্ছে<span class="loading-dots"><span>.</span><span>.</span><span>.</span></span></p>
+            
+            <div class="timer-container">
+                <svg class="timer-svg" viewBox="0 0 180 180">
+                    <circle class="timer-bg" cx="90" cy="90" r="80"></circle>
+                    <circle class="timer-progress" id="progressCircle" cx="90" cy="90" r="80"></circle>
+                </svg>
+                <div class="timer-text" id="timerText">50</div>
+                <div class="timer-label">সেকেন্ড</div>
             </div>
-
-            <form onsubmit="start(event)">
-                <div class="input-wrap">
-                    <span class="link-ico">🔗</span>
-                    <input type="url" id="url" placeholder="https://... যেকোনো লিংক" required autocomplete="off">
-                </div>
-                <div class="btn-row">
-                    <button class="btn" id="go" type="submit">⚡ ফাস্ট ডাউনলোড</button>
-                    <button class="btn btn-ghost" type="button" onclick="paste()">📋 পেস্ট</button>
-                </div>
-            </form>
-
-            <div class="progress-zone" id="pzone">
-                <div class="ring-wrap">
-                    <svg width="92" height="92">
-                        <defs>
-                            <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stop-color="#6c5ce7"/>
-                                <stop offset="100%" stop-color="#00cec9"/>
-                            </linearGradient>
-                        </defs>
-                        <circle class="ring-bg" cx="46" cy="46" r="40.5"/>
-                        <circle class="ring-fg" id="ring" cx="46" cy="46" r="40.5"/>
-                    </svg>
-                    <div class="ring-pct" id="pct">0%</div>
-                </div>
-                <div class="status-text" id="status">সংযোগ হচ্ছে...</div>
-                <div class="speed-row">
-                    <div class="speed-box"><div class="v" id="spd">—</div><div class="l">স্পিড</div></div>
-                    <div class="speed-box"><div class="v" id="eta">—</div><div class="l">বাকি</div></div>
-                    <div class="speed-box"><div class="v" id="conn">0</div><div class="l">কানেকশন</div></div>
-                </div>
-                <div class="threads" id="threads"></div>
-            </div>
-
-            <div class="info" id="info">
-                <div class="info-row"><span>📄 ফাইল</span><span id="iName">—</span></div>
-                <div class="info-row"><span>🗂️ টাইপ</span><span id="iType">—</span></div>
-                <div class="info-row"><span>📏 সাইজ</span><span id="iSize">—</span></div>
-                <div class="info-row"><span>🧩 মোড</span><span id="iMode">—</span></div>
-            </div>
-
-            <div class="done-badge" id="done">✅ ডাউনলোড সম্পূর্ণ!</div>
-            <a id="manualLink" class="manual-link" style="display:none" href="#" download>👆 এই লিংকে চাপুন — ডাউনলোড শুরু হবে</a>
-            <div class="err" id="err"></div>
-
-            <p class="chips-label">💡 উদাহরণ (চাপলে অটো ফিল)</p>
-            <div class="chips">
-                <button class="chip" onclick="fill('https://images.unsplash.com/photo-1518791841217-8f162f1e1131?w=1200')">🖼️ ছবি</button>
-                <button class="chip" onclick="fill('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3')">🎵 অডিও</button>
-                <button class="chip" onclick="fill('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4')">🎬 ছোট ভিডিও</button>
-                <button class="chip" onclick="fill('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4')">🚀 বড় ভিডিও</button>
-            </div>
-
-            <div class="foot">⚡ 4 API + 8x প্যারালাল চাঙ্ক ইঞ্জিন · Vercel Edge</div>
+            
+            <p class="note">⏱️ টাইমার শেষ হলে আপনার কী (Key) দেখানো হবে</p>
         </div>
+        
+        <!-- ============ কী সেকশন ============ -->
+        <div class="key-box" id="keyBox">
+            <div class="key-icon">🎉</div>
+            <div class="key-title">✅ আপনার কী তৈরি হয়েছে!</div>
+            
+            <div class="key-display" id="keyDisplay">----</div>
+            
+            <button class="copy-btn" id="copyBtn" onclick="copyKey()">
+                📋 কী কপি করুন
+            </button>
+            
+            <p class="note">
+                ⚠️ এই কী সংরক্ষণ করুন।<br>
+                টাইমার শেষ, এখন আপনি কী ব্যবহার করতে পারবেন।
+            </p>
+        </div>
+        
     </div>
 
     <script>
-        // ---- config: multiple proxy APIs for max speed + redundancy ----
-        const APIS = ['/api/proxy?url=', '/api/proxy2?url=', '/api/proxy3?url='];
-        const INFO = '/api/info?url=';
-        const PARALLEL = 8;       // concurrent chunk downloads
-        const CHUNK = 4 * 1048576; // 4 MB per chunk
-        const MAX_PARALLEL_RAM = 600 * 1048576; // above this, use direct stream instead of RAM assembly
-        const FS_ACCESS = 'showSaveFilePicker' in window; // direct-to-disk save (gallery)
-
-        const $ = id => document.getElementById(id);
-        const url = $('url'), go = $('go');
-        const pzone = $('pzone'), ring = $('ring'), pct = $('pct'), status = $('status');
-        const info = $('info'), done = $('done'), err = $('err');
-        const manualLink = $('manualLink');
-        const spd = $('spd'), eta = $('eta'), conn = $('conn'), threadsEl = $('threads');
-
-        function fill(u) { url.value = u; url.focus(); }
-
-        async function paste() {
+        // ============ কনফিগারেশন ============
+        const WAIT_SECONDS = 50;   // ⏱️ কত সেকেন্ড অপেক্ষা করবে
+        const KEY_LENGTH = 12;      // 🔑 কী এর দৈর্ঘ্য
+        
+        // ============ ভেরিয়েবল ============
+        let timeLeft = WAIT_SECONDS;
+        let generatedKey = '';
+        const circumference = 2 * Math.PI * 80; // r = 80
+        
+        const progressCircle = document.getElementById('progressCircle');
+        const timerText = document.getElementById('timerText');
+        const timerSection = document.getElementById('timerSection');
+        const keyBox = document.getElementById('keyBox');
+        const keyDisplay = document.getElementById('keyDisplay');
+        
+        // ============ কী জেনারেট ============
+        function generateKey() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let key = '';
+            for (let i = 0; i < KEY_LENGTH; i++) {
+                key += chars.charAt(Math.floor(Math.random() * chars.length));
+                // প্রতি ৪ অক্ষরে ড্যাশ
+                if ((i + 1) % 4 === 0 && i !== KEY_LENGTH - 1) {
+                    key += '-';
+                }
+            }
+            return key;
+        }
+        
+        // ============ টাইমার শুরু ============
+        function startTimer() {
+            // প্রথমবার progress circle সেট
+            progressCircle.style.strokeDasharray = circumference;
+            progressCircle.style.strokeDashoffset = 0;
+            
+            const interval = setInterval(() => {
+                timeLeft--;
+                
+                // টেক্সট আপডেট
+                timerText.textContent = timeLeft;
+                
+                // প্রগ্রেস সার্কেল আপডেট
+                const offset = circumference * ((WAIT_SECONDS - timeLeft) / WAIT_SECONDS);
+                progressCircle.style.strokeDashoffset = offset;
+                
+                // ⚡ শেষ ১০ সেকেন্ডে লাল রঙ
+                if (timeLeft <= 10) {
+                    progressCircle.style.stroke = '#ff4757';
+                    timerText.style.color = '#ff4757';
+                    progressCircle.style.filter = 'drop-shadow(0 0 8px #ff4757)';
+                }
+                
+                // 🎉 টাইমার শেষ
+                if (timeLeft <= 0) {
+                    clearInterval(interval);
+                    finishTimer();
+                }
+            }, 1000);
+        }
+        
+        // ============ টাইমার শেষ ============
+        function finishTimer() {
+            // কী জেনারেট
+            generatedKey = generateKey();
+            keyDisplay.textContent = generatedKey;
+            
+            // টাইমার হাইড, কী দেখাও
+            timerSection.style.display = 'none';
+            keyBox.style.display = 'block';
+            
+            // 🔊 সাউন্ড (ঐচ্ছিক)
             try {
-                const t = await navigator.clipboard.readText();
-                if (t && /^https?:\/\//i.test(t.trim())) { url.value = t.trim(); url.focus(); }
-                else { showErr('ক্লিপবোর্ডে লিংক নেই'); }
-            } catch (e) { showErr('ক্লিপবোর্ড অ্যাক্সেস ব্যর্থ — নিজে পেস্ট করুন'); }
+                const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT');
+                audio.volume = 0.3;
+                audio.play().catch(() => {});
+            } catch(e) {}
         }
-
-        function showErr(m) {
-            err.textContent = '❌ ' + m;
-            err.classList.add('show');
-            setTimeout(() => err.classList.remove('show'), 6000);
+        
+        // ============ কী কপি ============
+        function copyKey() {
+            const btn = document.getElementById('copyBtn');
+            
+            // মডার্ন ক্লিপবোর্ড API
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(generatedKey).then(() => {
+                    showCopied(btn);
+                }).catch(() => {
+                    fallbackCopy(generatedKey, btn);
+                });
+            } else {
+                fallbackCopy(generatedKey, btn);
+            }
         }
-
-        function reset() {
-            err.classList.remove('show'); info.classList.remove('show');
-            done.classList.remove('show'); pzone.classList.remove('show');
-            manualLink.classList.remove('show');
-            threadsEl.classList.remove('show'); threadsEl.innerHTML = '';
-            spd.textContent = '—'; eta.textContent = '—'; conn.textContent = '0';
-        }
-
-        function fmtSize(b) {
-            if (!b) return 'অজানা';
-            const mb = b / 1048576;
-            if (mb < 1) return Math.round(b / 1024) + ' KB';
-            if (mb < 1024) return mb.toFixed(2) + ' MB';
-            return (mb / 1024).toFixed(2) + ' GB';
-        }
-
-        function setRing(p) {
-            const c = 2 * Math.PI * 40.5;
-            ring.style.strokeDasharray = c;
-            ring.style.strokeDashoffset = c * (1 - p / 100);
-            pct.textContent = Math.min(100, Math.round(p)) + '%';
-        }
-
-        // fetch with a timeout so a hung chunk can't freeze the whole download
-        async function fetchTO(input, opts, ms) {
-            const ctrl = new AbortController();
-            const t = setTimeout(() => ctrl.abort(), ms);
-            try { return await fetch(input, Object.assign({}, opts, { signal: ctrl.signal })); }
-            finally { clearTimeout(t); }
-        }
-
-        // race the info probes across APIs; first answer wins (fastest endpoint)
-        async function raceInfo(u) {
-            const target = INFO + encodeURIComponent(u);
+        
+        function fallbackCopy(text, btn) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
             try {
-                const r = await Promise.any(APIS.map(() => fetch(target, { cache: 'no-store' }).then(r => r.ok ? r.json() : Promise.reject(new Error('bad')))));
-                return r;
-            } catch (e) {
-                // fall back to manual probe through any proxy
-                for (const a of APIS) {
-                    try {
-                        const r = await fetch(a + encodeURIComponent(u), { method: 'GET', headers: { 'Range': 'bytes=0-0' } });
-                        if (!r.ok && r.status !== 206) continue;
-                        let size = parseInt(r.headers.get('Content-Length') || '0', 10);
-                        const cr = r.headers.get('Content-Range');
-                        if (cr) { const m = cr.match(/\/(\d+)/); if (m) size = parseInt(m[1], 10); }
-                        const cd = r.headers.get('Content-Disposition') || '';
-                        const name = (cd.match(/filename="?([^"]+)"?/) || [])[1] || u.split('/').pop().split('?')[0] || 'download';
-                        r.body && r.body.cancel();
-                        return { ok: true, name, type: (r.headers.get('Content-Type') || 'application/octet-stream').split(';')[0], size, supportsRange: r.status === 206 };
-                    } catch (_) {}
-                }
-                throw new Error('কোনো API থেকে সাড়া পাওয়া যায়নি');
+                document.execCommand('copy');
+                showCopied(btn);
+            } catch(e) {
+                alert('কপি করতে সমস্যা হয়েছে। ম্যানুয়ালি কপি করুন:\n\n' + text);
             }
+            document.body.removeChild(textarea);
         }
-
-        async function start(e) {
-            e.preventDefault();
-            const u = url.value.trim();
-            if (!u) return;
-            reset();
-            go.disabled = true;
-            go.innerHTML = '<span class="spin" style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sp .8s linear infinite;vertical-align:middle;margin-right:.4rem"></span>অপেক্ষা...';
-            const sty = document.createElement('style');
-            sty.textContent = '@keyframes sp{to{transform:rotate(360deg)}}';
-            document.head.appendChild(sty);
-
-            pzone.classList.add('show');
-            setRing(3);
-            status.innerHTML = 'সংযোগ হচ্ছে...';
-
-            try {
-                // STEP 1: fastest-API info probe
-                const meta = await raceInfo(u);
-                if (meta.error) throw new Error(meta.error);
-
-                $('iName').textContent = meta.name;
-                $('iType').textContent = meta.type;
-                $('iSize').textContent = fmtSize(meta.size);
-                info.classList.add('show');
-
-                // STEP 2: pick the fastest proxy by racing a tiny range fetch
-                let apiIdx = 0;
-                try {
-                    apiIdx = await Promise.any(APIS.map((a, i) =>
-                        fetchTO(a + encodeURIComponent(u), { method: 'GET', headers: { 'Range': 'bytes=0-0' }, cache: 'no-store' }, 8000)
-                            .then(r => { if (!r.ok && r.status !== 206) throw new Error('x'); r.body && r.body.cancel(); return i; })
-                    ));
-                } catch (_) { apiIdx = 0; }
-                const PROXY = APIS[apiIdx];
-
-                const useParallel = meta.supportsRange && meta.size > CHUNK * 2 && meta.size < MAX_PARALLEL_RAM;
-
-                if (useParallel) {
-                    $('iMode').textContent = '⚡ 8x প্যারালাল চাঙ্ক';
-                    await parallelDownload(u, meta, PROXY);
-                } else {
-                    $('iMode').textContent = meta.supportsRange ? '🌊 ডিরেক্ট স্ট্রিম' : '🔗 ডিরেক্ট';
-                    await directDownload(u, meta, PROXY);
-                }
-
-            } catch (ex) {
-                pzone.classList.remove('show');
-                showErr(ex.message || 'ডাউনলোড ব্যর্থ — লিংক চেক করুন');
-            } finally {
-                go.disabled = false;
-                go.textContent = '⚡ ফাস্ট ডাউনলোড';
-            }
+        
+        function showCopied(btn) {
+            btn.textContent = '✅ কপি হয়েছে!';
+            btn.classList.add('copied');
+            setTimeout(() => {
+                btn.textContent = '📋 কী কপি করুন';
+                btn.classList.remove('copied');
+            }, 2000);
         }
-
-        // ---- direct single-stream download (small files or huge files) ----
-        async function directDownload(u, meta, PROXY) {
-            status.innerHTML = '⬇️ ডাউনলোড হচ্ছে... <b>' + fmtSize(meta.size) + '</b>';
-            const link = PROXY + encodeURIComponent(u);
-            const a = document.createElement('a');
-            a.href = link; a.download = meta.name;
-            document.body.appendChild(a); a.click(); a.remove();
-
-            // Show the link directly too — Telegram/browser may block programmatic clicks,
-            // so give a tappable link as a guaranteed fallback.
-            manualLink.href = link;
-            manualLink.download = meta.name;
-            manualLink.classList.add('show');
-
-            // animate progress (browser transfer is not measurable for cross-file saves)
-            let p = 10;
-            const iv = setInterval(() => {
-                p = Math.min(p + 6 + Math.random() * 14, 96);
-                setRing(p);
-                if (p >= 96) {
-                    clearInterval(iv);
-                    setRing(100);
-                    status.innerHTML = '✅ সম্পূর্ণ!';
-                    done.classList.add('show');
-                }
-            }, 240);
-        }
-
-        // ---- parallel chunked download: N connections at once ----
-        // Writes straight to disk via File System Access API (Chrome/Edge/Android):
-        // chunks land in the chosen file as they arrive -> 100% = already in gallery/files.
-        async function parallelDownload(u, meta, PROXY) {
-            const total = meta.size;
-            const starts = [];
-            for (let s = 0; s < total; s += CHUNK) starts.push(s);
-            const n = starts.length;
-            const partDone = new Array(n).fill(0);
-            let active = 0, nextQ = 0, finishedBytes = 0, okChunks = 0;
-            const t0 = performance.now();
-            let stopped = false;
-            let handle = null, fileStream = null;
-
-            const nThreads = Math.min(PARALLEL, n);
-
-            // Try to open a real file on disk (this is what makes it land in the gallery)
-            if (FS_ACCESS) {
-                try {
-                    handle = await window.showSaveFilePicker({
-                        suggestedName: meta.name,
-                        types: [{ description: 'ফাইল', accept: { [meta.type || 'application/octet-stream']: ['.' + (meta.name.split('.').pop() || 'bin')] } }],
-                    });
-                    fileStream = await handle.createWritable();
-                } catch (e) {
-                    // user cancelled or unsupported -> fall back to blob + link
-                    handle = null; fileStream = null;
-                }
-            }
-
-            // RAM array only used when direct disk writing isn't available
-            const partsRAM = fileStream ? null : new Array(n);
-
-            // per-thread bars
-            for (let i = 0; i < nThreads; i++) {
-                const el = document.createElement('div');
-                el.className = 'thread';
-                el.innerHTML = '<span class="lbl">T' + (i + 1) + '</span><div class="bar"><i id="tb' + i + '"></i></div><span id="tt' + i + '">0%</span>';
-                threadsEl.appendChild(el);
-            }
-            threadsEl.classList.add('show');
-
-            const link = PROXY + encodeURIComponent(u);
-            const baseIdx = APIS.indexOf(PROXY);
-
-            function updateUI() {
-                const p = (finishedBytes / total) * 100;
-                setRing(p);
-                const el = (performance.now() - t0) / 1000;
-                const bps = finishedBytes / el;
-                spd.textContent = bps > 0 ? (bps / 1048576).toFixed(1) + ' MB/s' : '…';
-                const rem = bps > 0 ? (total - finishedBytes) / bps : 0;
-                eta.textContent = rem > 0 ? (rem > 60 ? (rem / 60).toFixed(0) + ' মিনিট' : rem.toFixed(0) + ' সেকেন্ড') : '…';
-                conn.textContent = active;
-                for (let i = 0; i < nThreads; i++) {
-                    const bar = $('tb' + i), lbl = $('tt' + i);
-                    if (!bar) continue;
-                    const idx = i + (nextQ - nThreads);
-                    const tp = (idx >= 0 && idx < n && partDone[idx] !== undefined) ? (partDone[idx] / Math.min(CHUNK, total - starts[idx]) * 100) : 0;
-                    bar.style.width = Math.min(100, tp) + '%';
-                    lbl.textContent = Math.round(tp) + '%';
-                }
-            }
-
-            async function worker(slot) {
-                while (nextQ < n && !stopped) {
-                    const idx = nextQ++;
-                    const startB = starts[idx];
-                    const endB = Math.min(startB + CHUNK - 1, total - 1);
-                    const sz = endB - startB + 1;
-                    active++;
-                    try {
-                        const r = await fetchTO(link, { headers: { 'Range': 'bytes=' + startB + '-' + endB } }, 60000);
-                        if (!r.ok && r.status !== 206) throw new Error('range failed');
-                        const buf = await r.arrayBuffer();
-                        partDone[idx] = sz;
-                        finishedBytes += buf.byteLength;
-                        okChunks++;
-                        // write this chunk straight to disk at its offset
-                        if (fileStream) {
-                            await fileStream.seek(startB);
-                            await fileStream.write(buf);
-                        } else {
-                            partsRAM[idx] = buf;
-                        }
-                    } catch (e) {
-                        let saved = false;
-                        for (let k = 1; k < APIS.length; k++) {
-                            const alt = APIS[(baseIdx + k) % APIS.length];
-                            try {
-                                const r2 = await fetchTO(alt + encodeURIComponent(u), { headers: { 'Range': 'bytes=' + startB + '-' + endB } }, 60000);
-                                if (!r2.ok && r2.status !== 206) continue;
-                                const buf = await r2.arrayBuffer();
-                                partDone[idx] = sz;
-                                finishedBytes += buf.byteLength; okChunks++; saved = true;
-                                if (fileStream) {
-                                    await fileStream.seek(startB);
-                                    await fileStream.write(buf);
-                                } else {
-                                    partsRAM[idx] = buf;
-                                }
-                                break;
-                            } catch (_) {}
-                        }
-                        if (!saved) {
-                            stopped = true;
-                            showErr('চাঙ্ক ডাউনলোড ব্যর্থ — ফাইলটি সার্ভার দিচ্ছে না');
-                            return;
-                        }
-                    } finally { active--; }
-                    updateUI();
-                }
-            }
-
-            status.innerHTML = fileStream
-                ? '💾 ডিস্কে লেখা হচ্ছে — <b>' + nThreads + 'x</b> প্যারালালে...'
-                : '⚡ <b>' + nThreads + 'x</b> প্যারালালে ডাউনলোড হচ্ছে...';
-            const workers = [];
-            for (let i = 0; i < nThreads; i++) workers.push(worker(i));
-            await Promise.all(workers);
-
-            if (stopped || okChunks < n) {
-                if (fileStream) { try { await fileStream.abort(); } catch (_) {} }
-                if (finishedBytes > 0) {
-                    status.innerHTML = '⚠️ কিছু অংশ ব্যর্থ — ডিরেক্ট মোডে চেষ্টা করুন';
-                    manualLink.href = link;
-                    manualLink.download = meta.name;
-                    manualLink.classList.add('show');
-                }
-                return;
-            }
-
-            setRing(100);
-
-            if (fileStream) {
-                // everything is already on disk — just close the file
-                await fileStream.close();
-                const el = (performance.now() - t0) / 1000;
-                status.innerHTML = '✅ গ্যালারিতে সেভ হয়েছে! <b>' + fmtSize(total) + '</b> / ' + el.toFixed(1) + ' সেকেন্ডে';
-                $('done').textContent = '✅ ফাইল সেভ সম্পূর্ণ — গ্যালারি/ফাইলস দেখুন!';
-                $('done').classList.add('show');
-                updateUI();
-                return;
-            }
-
-            // Fallback: assemble in RAM and save via blob (or tappable link in Telegram)
-            status.innerHTML = '🧫 ফাইল একত্র করা হচ্ছে...';
-            const blob = new Blob(partsRAM, { type: meta.type || 'application/octet-stream' });
-            const blobUrl = URL.createObjectURL(blob);
-            try {
-                if (navigator.userAgent.indexOf('Telegram') > -1 || !('download' in document.createElement('a'))) throw new Error('skip');
-                const a = document.createElement('a');
-                a.href = blobUrl; a.download = meta.name;
-                document.body.appendChild(a); a.click(); a.remove();
-            } catch (_) {}
-            manualLink.href = blobUrl;
-            manualLink.download = meta.name;
-            manualLink.classList.add('show');
-            setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
-
-            const el = (performance.now() - t0) / 1000;
-            status.innerHTML = '✅ সম্পূর্ণ! <b>' + fmtSize(total) + '</b> / ' + el.toFixed(1) + ' সেকেন্ডে';
-            $('done').classList.add('show');
-            updateUI();
-        }
+        
+        // ============ শুরু ============
+        window.addEventListener('DOMContentLoaded', () => {
+            // ⚠️ ২ সেকেন্ড পর টাইমার শুরু (অ্যাড লোড হওয়ার সুযোগ)
+            setTimeout(startTimer, 2000);
+        });
     </script>
 </body>
 </html>
